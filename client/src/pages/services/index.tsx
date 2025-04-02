@@ -9,9 +9,9 @@ import { ServiceWithUser, serviceCategories } from '@/lib/types';
 
 const ServicesList: React.FC = () => {
   // Filter state
-  const [category, setCategory] = useState<string>('');
-  const [priceRange, setPriceRange] = useState<string>('');
-  const [deliveryTime, setDeliveryTime] = useState<string>('');
+  const [category, setCategory] = useState<string>('all');
+  const [priceRange, setPriceRange] = useState<string>('any');
+  const [deliveryTime, setDeliveryTime] = useState<string>('any-time');
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   // Fetch services
@@ -25,19 +25,19 @@ const ServicesList: React.FC = () => {
 
     return services.filter((service) => {
       // Category filter
-      if (category && service.category !== category) {
+      if (category && category !== 'all' && service.category !== category) {
         return false;
       }
 
       // Price range filter
-      if (priceRange) {
+      if (priceRange && priceRange !== 'any') {
         const [min, max] = priceRange.split('-').map(Number);
         if (min && service.price < min) return false;
         if (max && service.price > max) return false;
       }
 
-      // Delivery time filter (just matching the string for now)
-      if (deliveryTime && service.deliveryTime !== deliveryTime) {
+      // Delivery time filter
+      if (deliveryTime && deliveryTime !== 'any-time' && service.deliveryTime !== deliveryTime) {
         return false;
       }
 
@@ -56,9 +56,9 @@ const ServicesList: React.FC = () => {
 
   // Handle filter reset
   const handleReset = () => {
-    setCategory('');
-    setPriceRange('');
-    setDeliveryTime('');
+    setCategory('all');
+    setPriceRange('any');
+    setDeliveryTime('any-time');
     setSearchTerm('');
   };
 
@@ -91,7 +91,7 @@ const ServicesList: React.FC = () => {
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Categories</SelectItem>
+                <SelectItem value="all">All Categories</SelectItem>
                 {serviceCategories.map((cat) => (
                   <SelectItem key={cat} value={cat}>
                     {cat}
@@ -110,7 +110,7 @@ const ServicesList: React.FC = () => {
                 <SelectValue placeholder="Any Price" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Any Price</SelectItem>
+                <SelectItem value="any">Any Price</SelectItem>
                 <SelectItem value="5-50">$5 - $50</SelectItem>
                 <SelectItem value="50-100">$50 - $100</SelectItem>
                 <SelectItem value="100-500">$100 - $500</SelectItem>
@@ -128,7 +128,7 @@ const ServicesList: React.FC = () => {
                 <SelectValue placeholder="Any Time" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Any Time</SelectItem>
+                <SelectItem value="any-time">Any Time</SelectItem>
                 <SelectItem value="Express 24H">Express 24H</SelectItem>
                 <SelectItem value="Up to 3 days">Up to 3 days</SelectItem>
                 <SelectItem value="Up to 7 days">Up to 7 days</SelectItem>

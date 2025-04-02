@@ -1,0 +1,52 @@
+ D:\replit.com\26\CodeCraft> npm run dev
+
+> rest-express@1.0.0 dev
+> tsx server/index.ts
+
+3:31:50 PM [storage] Using in-memory storage implementation
+3:31:50 PM [server] Using in-memory storage for data persistence
+3:31:50 PM [storage] Using in-memory storage implementation
+3:31:50 PM [express] serving on port 5000
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+3:32:11 PM [express] GET /api/services 200 in 7ms :: []
+3:32:11 PM [express] GET /api/jobs 304 in 2ms :: []
+3:32:11 PM [express] GET /api/auth/me 401 in 3ms
+3:32:46 PM [express] GET /api/services 304 in 2ms :: []
+3:32:46 PM [express] GET /api/jobs 304 in 1ms :: []
+3:32:46 PM [express] GET /api/auth/me 401 in 1ms
+3:32:58 PM [express] GET /api/services 304 in 2ms :: []
+3:32:58 PM [express] GET /api/jobs 304 in 1ms :: []
+3:32:58 PM [express] GET /api/auth/me 401 in 2ms
+3:33:58 PM [express] GET /api/services 304 in 1ms :: []
+3:33:58 PM [express] GET /api/jobs 304 in 1ms :: []
+3:33:58 PM [express] GET /api/auth/me 401 in 1ms
+3:34:27 PM [express] POST /api/auth/register 201 in 7ms :: {"username":"oussama","email":"oussama@gm…
+3:34:44 PM [express] GET /api/users/1/services 200 in 4ms :: []
+3:34:44 PM [express] GET /api/users/1/applications 200 in 5ms :: []
+3:34:44 PM [express] GET /api/users/1/orders 200 in 5ms :: []
+3:35:03 PM [express] PUT /api/users/1 500 in 3ms :: {"message":"Unexpected end of form"}
+Error: Unexpected end of form
+    at Multipart._final (D:\replit.com\26\CodeCraft\node_modules\busboy\lib\types\multipart.js:588:17)
+    at prefinish (node:internal/streams/writable:916:14)
+    at finishMaybe (node:internal/streams/writable:930:5)
+    at Writable.end (node:internal/streams/writable:845:5)
+    at onend (node:internal/streams/readable:948:10)
+    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)
+3:35:11 PM [express] PUT /api/users/1 500 in 2ms :: {"message":"Unexpected end of form"}
+Error: Unexpected end of form
+    at Multipart._final (D:\replit.com\26\CodeCraft\node_modules\busboy\lib\types\multipart.js:588:17)
+    at prefinish (node:internal/streams/writable:916:14)
+    at finishMaybe (node:internal/streams/writable:930:5)
+    at Writable.end (node:internal/streams/writable:845:5)
+    at onend (node:internal/streams/readable:948:10)
+    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)
+3:35:19 PM [express] PUT /api/users/1 500 in 3ms :: {"message":"Unexpected end of form"}
+Error: Unexpected end of form
+    at Multipart._final (D:\replit.com\26\CodeCraft\node_modules\busboy\lib\types\multipart.js:588:17)
+    at prefinish (node:internal/streams/writable:916:14)
+    at finishMaybe (node:internal/streams/writable:930:5)
+    at Writable.end (node:internal/streams/writable:845:5)
+    at onend (node:internal/streams/readable:948:10)
+    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)

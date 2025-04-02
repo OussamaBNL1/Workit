@@ -59,17 +59,28 @@ export async function saveFile(file: fileUpload.UploadedFile, subfolder: string 
  * @returns The uploaded file or null if not found
  */
 export function getFileFromRequest(req: Request, fieldName: string): fileUpload.UploadedFile | null {
-  if (!req.files || Object.keys(req.files).length === 0) {
+  try {
+    if (!req.files) {
+      return null;
+    }
+    
+    // Type assertion - we know req.files exists at this point
+    const files = req.files as any;
+    
+    if (!files[fieldName]) {
+      return null;
+    }
+    
+    // Handle case when multiple files are uploaded with the same field name
+    if (Array.isArray(files[fieldName])) {
+      return files[fieldName][0];
+    }
+    
+    return files[fieldName];
+  } catch (error) {
+    console.error('Error getting file from request:', error);
     return null;
   }
-  
-  const file = req.files[fieldName];
-  if (!file) {
-    return null;
-  }
-  
-  // Handle case when multiple files are uploaded with the same field name
-  return Array.isArray(file) ? file[0] : file;
 }
 
 /**

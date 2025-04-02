@@ -9,9 +9,9 @@ import { JobWithUser, jobTypes } from '@/lib/types';
 
 const JobsList: React.FC = () => {
   // Filter state
-  const [category, setCategory] = useState<string>('');
-  const [jobType, setJobType] = useState<string>('');
-  const [location, setLocation] = useState<string>('');
+  const [category, setCategory] = useState<string>('all');
+  const [jobType, setJobType] = useState<string>('all-types');
+  const [location, setLocation] = useState<string>('anywhere');
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   // Fetch jobs
@@ -25,17 +25,17 @@ const JobsList: React.FC = () => {
 
     return jobs.filter((job) => {
       // Category filter
-      if (category && job.category !== category) {
+      if (category && category !== 'all' && job.category !== category) {
         return false;
       }
 
       // Job type filter
-      if (jobType && job.jobType !== jobType) {
+      if (jobType && jobType !== 'all-types' && job.jobType !== jobType) {
         return false;
       }
 
       // Location filter
-      if (location && job.location !== location) {
+      if (location && location !== 'anywhere' && job.location !== location) {
         return false;
       }
 
@@ -54,9 +54,9 @@ const JobsList: React.FC = () => {
 
   // Handle filter reset
   const handleReset = () => {
-    setCategory('');
-    setJobType('');
-    setLocation('');
+    setCategory('all');
+    setJobType('all-types');
+    setLocation('anywhere');
     setSearchTerm('');
   };
 
@@ -89,7 +89,7 @@ const JobsList: React.FC = () => {
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Categories</SelectItem>
+                <SelectItem value="all">All Categories</SelectItem>
                 <SelectItem value="Web Development">Web Development</SelectItem>
                 <SelectItem value="Design">Design</SelectItem>
                 <SelectItem value="Writing">Writing</SelectItem>
@@ -112,7 +112,7 @@ const JobsList: React.FC = () => {
                 <SelectValue placeholder="All Types" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Types</SelectItem>
+                <SelectItem value="all-types">All Types</SelectItem>
                 {jobTypes.map((type) => (
                   <SelectItem key={type} value={type}>
                     {type}
@@ -131,7 +131,7 @@ const JobsList: React.FC = () => {
                 <SelectValue placeholder="Anywhere" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Anywhere</SelectItem>
+                <SelectItem value="anywhere">Anywhere</SelectItem>
                 <SelectItem value="Remote Only">Remote Only</SelectItem>
                 <SelectItem value="United States">United States</SelectItem>
                 <SelectItem value="Europe">Europe</SelectItem>

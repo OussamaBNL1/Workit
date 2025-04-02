@@ -84,73 +84,7 @@ const About: React.FC = () => {
         </div>
       </div>
 
-      {/* Team Section */}
-      <div className="py-12 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:text-center mb-12">
-            <h2 className="text-base text-primary font-semibold tracking-wide uppercase">Our Team</h2>
-            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-              Meet the people behind WorkiT
-            </p>
-            <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
-              Our diverse team is passionate about creating opportunities and connecting talent with businesses.
-            </p>
-          </div>
 
-          <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="text-center">
-              <div className="mx-auto h-40 w-40 rounded-full overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=4&w=256&h=256&q=80"
-                  alt="Team member"
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <div className="mt-4">
-                <h3 className="text-lg font-medium text-gray-900">Sarah Johnson</h3>
-                <p className="text-primary">CEO & Co-Founder</p>
-                <p className="mt-2 text-gray-500">
-                  With over 10 years of experience in tech and business, Sarah leads our strategic vision.
-                </p>
-              </div>
-            </div>
-
-            <div className="text-center">
-              <div className="mx-auto h-40 w-40 rounded-full overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=4&w=256&h=256&q=80"
-                  alt="Team member"
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <div className="mt-4">
-                <h3 className="text-lg font-medium text-gray-900">David Chen</h3>
-                <p className="text-primary">CTO & Co-Founder</p>
-                <p className="mt-2 text-gray-500">
-                  David brings his technical expertise to ensure our platform is secure, scalable, and user-friendly.
-                </p>
-              </div>
-            </div>
-
-            <div className="text-center">
-              <div className="mx-auto h-40 w-40 rounded-full overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=4&w=256&h=256&q=80"
-                  alt="Team member"
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <div className="mt-4">
-                <h3 className="text-lg font-medium text-gray-900">Maya Patel</h3>
-                <p className="text-primary">Head of Community</p>
-                <p className="mt-2 text-gray-500">
-                  Maya works tirelessly to support our users and build a vibrant community of freelancers and clients.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Contact Us Section */}
       <div className="py-12 bg-gray-50 rounded-lg my-12">
