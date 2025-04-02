@@ -1,0 +1,59 @@
+1. Visitor Access:
+- Visitors can browse the platform but cannot interact with it (e.g., creating jobs or services).
+- Visitors can:
+- View other users' profiles.
+- See all details about services and jobs.
+- Cannot apply for jobs or order services.
+
+2. User Registration & Login:
+- Visitors can register as a freelancer or employer to become a user.
+- Once logged in:
+- A profile icon appears in the navbar.
+- Through the profile icon, users can:
+- Modify their profile picture and bio.
+- Create a service or job.
+- All modifications (profile updates, services, or jobs) are reflected on the platform.
+- If the user logs out:
+- Their created services or jobs remain accessible to other users on the platform.
+
+3. Creating Services or Jobs:
+- Users can upload images for services or jobs directly from their desktop.
+- When a service or job is successfully created:
+- It appears on the platform with:
+- The uploaded image.
+- The username of the publisher.
+
+4. About Page:
+- Add a Contact Us feature with the email: `"hi@workit@gmail.com"`.
+
+5. User Profile Page:
+- Design the profile page to look simple and nice.
+
+6. Service & Job Detail Pages:
+- When a user clicks View Details on a service or job:
+- They are taken to the detail page of that service or job.
+- On the Service Detail Page:
+- Order Now button:
+- Redirects to a payment page with options for:
+- Card Payment.
+- Bank Transfer.
+- View Profile button:
+- Redirects to the owner's profile page.
+- Users can leave reviews for the service.
+- Reviews are saved in the database.
+- On the Job Detail Page:
+- Apply Now button:
+- Redirects to an application form with:
+- A description field.
+- An option to upload a CV from the desktop (no size limitation).
+- Applications are saved in the database.
+- The job owner can:
+- Approve or dismiss applications from their profile.
+
+7. Contact Freelancer Button:
+- On the Service Detail Page, add a button labeled Contact Freelancer.
+- Clicking the button redirects to a page that says:
+- `"This feature will be added soon. In the meantime, contact the freelancer through their contact information in their profile or bio. With all our appreciation, WorkiT Team."`
+
+8. Database:
+- All information (services, jobs, profiles, reviews, applications) must be saved in the database.
