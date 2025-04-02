@@ -1,10 +1,12 @@
 import mongoose from 'mongoose';
 import { log } from '../vite';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 
 // Create a cached connection variable 
 interface MongoConnection {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
+  mongoMemoryServer?: MongoMemoryServer;
 }
 
 let cachedConnection: MongoConnection = { conn: null, promise: null };
@@ -21,7 +23,21 @@ export async function connectToMongoDB() {
 
   // If a connection is being established, wait for it to complete
   if (!cachedConnection.promise) {
-    const MONGODB_URI = process.env.MONGODB_URI;
+    let MONGODB_URI = process.env.MONGODB_URI;
+    
+    // If USE_MONGODB_MEMORY_SERVER is set, use the in-memory MongoDB server
+    if (process.env.NODE_ENV !== 'production') {
+      try {
+        // Create an in-memory MongoDB server
+        const mongoMemoryServer = await MongoMemoryServer.create();
+        MONGODB_URI = mongoMemoryServer.getUri();
+        cachedConnection.mongoMemoryServer = mongoMemoryServer;
+        log('Using MongoDB Memory Server: ' + MONGODB_URI, 'mongodb');
+      } catch (error) {
+        log(`Error starting MongoDB Memory Server: ${error}`, 'mongodb');
+        // Fall back to the environment variable
+      }
+    }
 
     if (!MONGODB_URI) {
       throw new Error('Please define the MONGODB_URI environment variable');

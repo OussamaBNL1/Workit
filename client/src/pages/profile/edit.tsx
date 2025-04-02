@@ -58,13 +58,19 @@ const EditProfile: React.FC = () => {
       // Create FormData for file upload
       const formData = new FormData();
       
-      if (data.bio) {
-        formData.append('bio', data.bio);
+      if (data.bio !== undefined) {
+        formData.append('bio', data.bio || '');
       }
       
-      if (data.profilePicture) {
+      if (data.profilePicture && data.profilePicture instanceof File) {
         formData.append('profilePicture', data.profilePicture);
       }
+
+      console.log('Submitting profile update:', {
+        bio: data.bio,
+        hasProfilePicture: !!data.profilePicture,
+        profilePictureType: data.profilePicture instanceof File ? 'File' : typeof data.profilePicture
+      });
 
       const response = await fetch(`/api/users/${user?.id}`, {
         method: 'PUT',
@@ -142,9 +148,8 @@ const EditProfile: React.FC = () => {
                             id="profile-picture"
                             label="Profile Picture"
                             accept="image/*"
-                            value={value}
+                            value={value || user.profilePicture}
                             onChange={onChange}
-                            previewUrl={user.profilePicture}
                             {...fieldProps}
                           />
                         </FormControl>

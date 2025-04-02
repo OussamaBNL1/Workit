@@ -18,7 +18,7 @@ interface UploadedFile {
  * @param subfolder Optional subfolder within uploads directory
  * @returns Object with file path, name and URL
  */
-export async function saveFile(file: fileUpload.UploadedFile, subfolder: string = ''): Promise<UploadedFile> {
+export async function saveFile(file: any, subfolder: string = ''): Promise<UploadedFile> {
   // Create uploads directory if it doesn't exist
   const uploadsDir = path.join(process.cwd(), 'uploads');
   if (!fs.existsSync(uploadsDir)) {
@@ -58,7 +58,7 @@ export async function saveFile(file: fileUpload.UploadedFile, subfolder: string 
  * @param fieldName Form field name containing the file
  * @returns The uploaded file or null if not found
  */
-export function getFileFromRequest(req: Request, fieldName: string): fileUpload.UploadedFile | null {
+export function getFileFromRequest(req: Request, fieldName: string): any {
   try {
     if (!req.files) {
       return null;
@@ -88,7 +88,7 @@ export function getFileFromRequest(req: Request, fieldName: string): fileUpload.
  * @param file The uploaded file
  * @returns boolean indicating if file is a valid image
  */
-export function validateImageFile(file: fileUpload.UploadedFile): boolean {
+export function validateImageFile(file: any): boolean {
   const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
   return allowedTypes.includes(file.mimetype);
 }
@@ -98,7 +98,7 @@ export function validateImageFile(file: fileUpload.UploadedFile): boolean {
  * @param file The uploaded file
  * @returns boolean indicating if file is a valid document
  */
-export function validateDocumentFile(file: fileUpload.UploadedFile): boolean {
+export function validateDocumentFile(file: any): boolean {
   const allowedTypes = [
     'application/pdf',                                                        // PDF
     'application/msword',                                                    // DOC

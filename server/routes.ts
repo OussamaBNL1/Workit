@@ -18,6 +18,11 @@ import bcrypt from "bcrypt";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import fileUpload from "express-fileupload";
+
+// Define custom Request type that includes files from express-fileupload
+// Remove the declaration because it conflicts with built-in Express type
+// We'll use explicit type assertions when working with files
 
 // Setup file upload
 const uploadDir = path.join(process.cwd(), "uploads");
@@ -191,7 +196,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/users/:id', isAuthenticated, upload.single('profilePicture'), async (req, res) => {
+  app.put('/api/users/:id', isAuthenticated, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const currentUser = req.user as any;
@@ -201,11 +206,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "You can only update your own profile" });
       }
       
-      // Handle file upload
+      // Handle file upload using express-fileupload
       const userData: any = { ...req.body };
-      if (req.file) {
-        userData.profilePicture = `/uploads/${req.file.filename}`;
+      
+      if (req.files && typeof req.files === 'object' && 'profilePicture' in req.files) {
+        // Import and use the fileUpload utility
+        const { saveFile } = await import('./utils/fileUpload');
+        // Use any to bypass type checking since we know the object has the correct structure
+        const uploadedFile = (req.files as any).profilePicture;
+        const uploadResult = await saveFile(uploadedFile, 'profiles');
+        userData.profilePicture = uploadResult.fileUrl;
+        console.log('Profile picture uploaded:', uploadResult.fileUrl);
       }
+      
+      console.log('Updating user with data:', userData);
       
       const updatedUser = await storage.updateUser(id, userData);
       if (!updatedUser) {
@@ -216,6 +230,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { password, ...safeUser } = updatedUser;
       res.json(safeUser);
     } catch (error: any) {
+      console.error('Error updating user:', error);
       res.status(400).json({ message: error.message });
     }
   });
@@ -265,19 +280,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/services', isAuthenticated, upload.single('image'), async (req, res) => {
+  app.post('/api/services', isAuthenticated, async (req, res) => {
     try {
       const serviceData = insertServiceSchema.parse(req.body);
       const userId = (req.user as any).id;
       
-      // Handle file upload
-      if (req.file) {
-        serviceData.image = `/uploads/${req.file.filename}`;
+      // Handle file upload using express-fileupload
+      if (req.files && typeof req.files === 'object' && 'image' in req.files) {
+        // Import and use the fileUpload utility
+        const { saveFile } = await import('./utils/fileUpload');
+        // Use any to bypass type checking since we know the object has the correct structure
+        const uploadedFile = (req.files as any).image;
+        const uploadResult = await saveFile(uploadedFile, 'services');
+        serviceData.image = uploadResult.fileUrl;
+        console.log('Service image uploaded:', uploadResult.fileUrl);
       }
       
       const service = await storage.createService(userId, serviceData);
       res.status(201).json(service);
     } catch (error: any) {
+      console.error('Error creating service:', error);
       res.status(400).json({ message: error.message });
     }
   });
