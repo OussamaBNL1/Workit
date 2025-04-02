@@ -1,56 +1,46 @@
-import mongoose, { Document, Schema } from 'mongoose';
-import { IUser } from './user.model';
+import mongoose, { Schema, Document } from 'mongoose';
+import { Service } from '@shared/schema';
 
-// Interface representing a service document in MongoDB
-export interface IService extends Document {
-  id: number;
-  userId: number | IUser;
-  title: string;
-  description: string;
-  price: number;
-  category: string;
-  status: 'active' | 'inactive';
-  image?: string;
-  deliveryTime?: string;
-  createdAt: Date;
+export interface IService extends Document, Omit<Service, 'id'> {
+  // MongoDB will use _id, but we'll map it to id
 }
 
-// Create the service schema
 const ServiceSchema: Schema = new Schema({
-  id: { type: Number, required: true, unique: true },
-  userId: { type: Number, required: true, ref: 'User' },
+  userId: { type: Number, required: true, index: true },
   title: { type: String, required: true },
   description: { type: String, required: true },
   price: { type: Number, required: true },
   category: { type: String, required: true },
-  status: { 
-    type: String, 
-    required: true, 
-    enum: ['active', 'inactive'],
-    default: 'active' 
-  },
-  image: { type: String, default: null },
-  deliveryTime: { type: String, default: null },
-  createdAt: { type: Date, default: Date.now }
-}, {
-  // Add virtual fields for populating user data
+  deliveryTime: { type: String, required: true },
+  images: { type: [String], default: [] },
+  status: { type: String, enum: ['active', 'paused', 'deleted'], default: 'active' },
+}, { 
+  timestamps: true,
   toJSON: {
     virtuals: true,
     transform: (_, ret) => {
-      ret.id = ret.id;
+      ret.id = ret._id;
       delete ret._id;
       delete ret.__v;
+      return ret;
+    }
+  },
+  toObject: {
+    virtuals: true,
+    transform: (_, ret) => {
+      ret.id = ret._id;
+      delete ret._id;
+      delete ret.__v;
+      return ret;
     }
   }
 });
 
-// Virtual for user data
-ServiceSchema.virtual('user', {
-  ref: 'User',
-  localField: 'userId',
-  foreignField: 'id',
-  justOne: true
-});
+// Create indexes for search and filtering
+ServiceSchema.index({ title: 'text', description: 'text' });
+ServiceSchema.index({ category: 1 });
+ServiceSchema.index({ price: 1 });
+ServiceSchema.index({ status: 1 });
 
-// Create and export the model
-export default mongoose.model<IService>('Service', ServiceSchema);
+// Export the model or create it if it doesn't exist
+export default mongoose.models.Service || mongoose.model<IService>('Service', ServiceSchema);

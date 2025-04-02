@@ -1,57 +1,42 @@
-import mongoose, { Document, Schema } from 'mongoose';
-import { IUser } from './user.model';
-import { IService } from './service.model';
+import mongoose, { Schema, Document } from 'mongoose';
+import { Review } from '@shared/schema';
 
-// Interface representing a review document in MongoDB
-export interface IReview extends Document {
-  id: number;
-  serviceId: number | IService;
-  userId: number | IUser;
-  rating: number;
-  comment?: string;
-  createdAt: Date;
+export interface IReview extends Document, Omit<Review, 'id'> {
+  // MongoDB will use _id, but we'll map it to id
 }
 
-// Create the review schema
 const ReviewSchema: Schema = new Schema({
-  id: { type: Number, required: true, unique: true },
-  serviceId: { type: Number, required: true, ref: 'Service' },
-  userId: { type: Number, required: true, ref: 'User' },
-  rating: { 
-    type: Number, 
-    required: true,
-    min: 1,
-    max: 5
-  },
-  comment: { type: String, default: null },
-  createdAt: { type: Date, default: Date.now }
-}, {
-  // Add virtual fields for populating related data
+  userId: { type: Number, required: true, index: true },
+  serviceId: { type: Number, required: true, index: true },
+  rating: { type: Number, required: true, min: 1, max: 5 },
+  comment: { type: String, required: true },
+}, { 
+  timestamps: true,
   toJSON: {
     virtuals: true,
     transform: (_, ret) => {
-      ret.id = ret.id;
+      ret.id = ret._id;
       delete ret._id;
       delete ret.__v;
+      return ret;
+    }
+  },
+  toObject: {
+    virtuals: true,
+    transform: (_, ret) => {
+      ret.id = ret._id;
+      delete ret._id;
+      delete ret.__v;
+      return ret;
     }
   }
 });
 
-// Virtual for user data
-ReviewSchema.virtual('user', {
-  ref: 'User',
-  localField: 'userId',
-  foreignField: 'id',
-  justOne: true
-});
+// Create indexes for aggregations
+ReviewSchema.index({ rating: 1 });
 
-// Virtual for service data
-ReviewSchema.virtual('service', {
-  ref: 'Service',
-  localField: 'serviceId',
-  foreignField: 'id',
-  justOne: true
-});
+// Compound index for unique review per user per service
+ReviewSchema.index({ userId: 1, serviceId: 1 }, { unique: true });
 
-// Create and export the model
-export default mongoose.model<IReview>('Review', ReviewSchema);
+// Export the model or create it if it doesn't exist
+export default mongoose.models.Review || mongoose.model<IReview>('Review', ReviewSchema);

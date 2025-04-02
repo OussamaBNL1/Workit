@@ -1,58 +1,47 @@
-import mongoose, { Document, Schema } from 'mongoose';
-import { IUser } from './user.model';
+import mongoose, { Schema, Document } from 'mongoose';
+import { Job } from '@shared/schema';
 
-// Interface representing a job document in MongoDB
-export interface IJob extends Document {
-  id: number;
-  userId: number | IUser;
-  title: string;
-  description: string;
-  budget: number;
-  category: string;
-  location?: string;
-  jobType: string;
-  status: 'open' | 'closed';
-  image?: string;
-  createdAt: Date;
+export interface IJob extends Document, Omit<Job, 'id'> {
+  // MongoDB will use _id, but we'll map it to id
 }
 
-// Create the job schema
 const JobSchema: Schema = new Schema({
-  id: { type: Number, required: true, unique: true },
-  userId: { type: Number, required: true, ref: 'User' },
+  userId: { type: Number, required: true, index: true },
   title: { type: String, required: true },
   description: { type: String, required: true },
   budget: { type: Number, required: true },
   category: { type: String, required: true },
-  location: { type: String, default: null },
-  jobType: { type: String, required: true },
-  status: { 
-    type: String, 
-    required: true, 
-    enum: ['open', 'closed'],
-    default: 'open'
-  },
-  image: { type: String, default: null },
-  createdAt: { type: Date, default: Date.now }
-}, {
-  // Add virtual fields for populating user data
+  skills: { type: [String], default: [] },
+  duration: { type: String, required: true },
+  status: { type: String, enum: ['open', 'closed'], default: 'open' },
+}, { 
+  timestamps: true,
   toJSON: {
     virtuals: true,
     transform: (_, ret) => {
-      ret.id = ret.id;
+      ret.id = ret._id;
       delete ret._id;
       delete ret.__v;
+      return ret;
+    }
+  },
+  toObject: {
+    virtuals: true,
+    transform: (_, ret) => {
+      ret.id = ret._id;
+      delete ret._id;
+      delete ret.__v;
+      return ret;
     }
   }
 });
 
-// Virtual for user data
-JobSchema.virtual('user', {
-  ref: 'User',
-  localField: 'userId',
-  foreignField: 'id',
-  justOne: true
-});
+// Create indexes for search and filtering
+JobSchema.index({ title: 'text', description: 'text' });
+JobSchema.index({ category: 1 });
+JobSchema.index({ budget: 1 });
+JobSchema.index({ status: 1 });
+JobSchema.index({ skills: 1 });
 
-// Create and export the model
-export default mongoose.model<IJob>('Job', JobSchema);
+// Export the model or create it if it doesn't exist
+export default mongoose.models.Job || mongoose.model<IJob>('Job', JobSchema);

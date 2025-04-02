@@ -1,5 +1,6 @@
 import express, { type Express, type Request, type Response } from "express";
 import { createServer, type Server } from "http";
+import { type IStorage } from "./storage";
 import { createStorage } from "./storageFactory";
 import { 
   insertUserSchema, 
@@ -45,9 +46,8 @@ function isAuthenticated(req: Request, res: Response, next: Function) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Create storage instance using the factory
+  // Get storage from factory in index.ts
   const storage = createStorage();
-  
   // Setup session
   app.use(session({
     secret: process.env.SESSION_SECRET || "workit-secret",
@@ -443,9 +443,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid status" });
       }
       
-      // Find the application
-      const applications = Array.from((storage as any).applications.values());
-      const application = applications.find(app => app.id === id);
+      // Find the application directly
+      const application = await storage.getApplicationsForJob(0) // Get all applications
+        .then(apps => apps.find(app => app.id === id));
       
       if (!application) {
         return res.status(404).json({ message: "Application not found" });

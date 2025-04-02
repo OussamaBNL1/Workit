@@ -1,12 +1,7 @@
 import mongoose from 'mongoose';
 import { log } from '../vite';
 
-// MongoDB connection string - use MONGODB_URI environment variable
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/workit';
-
-// Don't use DATABASE_URL as it might be a PostgreSQL connection string
-
-// Cached connection
+// Create a cached connection variable 
 interface MongoConnection {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
@@ -19,32 +14,39 @@ let cachedConnection: MongoConnection = { conn: null, promise: null };
  * @returns Connection instance
  */
 export async function connectToMongoDB() {
-  // If we have a cached connection, return it
+  // If we already have a connection, return it
   if (cachedConnection.conn) {
     return cachedConnection.conn;
   }
 
+  // If a connection is being established, wait for it to complete
   if (!cachedConnection.promise) {
+    const MONGODB_URI = process.env.MONGODB_URI;
+
+    if (!MONGODB_URI) {
+      throw new Error('Please define the MONGODB_URI environment variable');
+    }
+
+    // Set up MongoDB connection options with newer settings
     const opts = {
-      bufferCommands: true,
+      bufferCommands: false,
     };
 
-    log(`Connecting to MongoDB at ${MONGODB_URI}`);
-    
-    // Create a new connection promise
-    cachedConnection.promise = mongoose.connect(MONGODB_URI, opts)
+    // Create the connection promise
+    cachedConnection.promise = mongoose
+      .connect(MONGODB_URI, opts)
       .then((mongoose) => {
-        log('MongoDB connected successfully!');
+        log('Connected to MongoDB', 'mongodb');
         return mongoose;
       })
       .catch((error) => {
-        log(`Error connecting to MongoDB: ${error.message}`, 'error');
+        log(`Error connecting to MongoDB: ${error.message}`, 'mongodb');
         cachedConnection.promise = null;
         throw error;
       });
   }
-  
-  // Wait for the connection to establish
+
+  // Wait for the connection to complete
   cachedConnection.conn = await cachedConnection.promise;
   return cachedConnection.conn;
 }

@@ -1,43 +1,50 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
+import { User } from '@shared/schema';
 
-// Interface representing a user document in MongoDB
-export interface IUser extends Document {
-  id: number;
-  username: string;
-  email: string;
-  password: string;
-  role: 'freelancer' | 'employer';
-  bio?: string;
-  profilePicture?: string;
-  createdAt: Date;
+export interface IUser extends Document, Omit<User, 'id'> {
+  // MongoDB will use _id, but we'll map it to id
 }
 
-// Create the user schema
 const UserSchema: Schema = new Schema({
-  id: { type: Number, required: true, unique: true },
   username: { type: String, required: true, unique: true },
-  email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { 
-    type: String, 
-    required: true, 
-    enum: ['freelancer', 'employer'] 
-  },
-  bio: { type: String, default: null },
-  profilePicture: { type: String, default: null },
-  createdAt: { type: Date, default: Date.now }
-}, {
-  // Convert _id to id when converting to JSON
+  email: { type: String, required: true, unique: true },
+  fullName: { type: String, required: true },
+  role: { type: String, enum: ['freelancer', 'employer'], required: true },
+  profilePicture: { type: String, default: '' },
+  bio: { type: String, default: '' },
+  skills: { type: [String], default: [] },
+  location: { type: String, default: '' },
+}, { 
+  timestamps: true,
   toJSON: {
+    virtuals: true,
     transform: (_, ret) => {
-      ret.id = ret.id;
+      ret.id = ret._id;
+      delete ret.password; // Remove password
       delete ret._id;
       delete ret.__v;
-      // Don't return password in JSON
-      delete ret.password;
+      return ret;
+    }
+  },
+  toObject: {
+    virtuals: true,
+    transform: (_, ret) => {
+      ret.id = ret._id;
+      delete ret.password; // Remove password
+      delete ret._id;
+      delete ret.__v;
+      return ret;
     }
   }
 });
 
-// Create and export the model
-export default mongoose.model<IUser>('User', UserSchema);
+// Create indexes for searching users
+UserSchema.index({ username: 1 }, { unique: true });
+UserSchema.index({ email: 1 }, { unique: true });
+UserSchema.index({ fullName: 'text' });
+UserSchema.index({ role: 1 });
+UserSchema.index({ skills: 1 });
+
+// Export the model or create it if it doesn't exist
+export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema);

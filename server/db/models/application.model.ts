@@ -1,59 +1,44 @@
-import mongoose, { Document, Schema } from 'mongoose';
-import { IUser } from './user.model';
-import { IJob } from './job.model';
+import mongoose, { Schema, Document } from 'mongoose';
+import { Application } from '@shared/schema';
 
-// Interface representing an application document in MongoDB
-export interface IApplication extends Document {
-  id: number;
-  jobId: number | IJob;
-  userId: number | IUser;
-  description: string;
-  resumeFile?: string;
-  status: 'pending' | 'approved' | 'rejected';
-  createdAt: Date;
+export interface IApplication extends Document, Omit<Application, 'id'> {
+  // MongoDB will use _id, but we'll map it to id
 }
 
-// Create the application schema
 const ApplicationSchema: Schema = new Schema({
-  id: { type: Number, required: true, unique: true },
-  jobId: { type: Number, required: true, ref: 'Job' },
-  userId: { type: Number, required: true, ref: 'User' },
-  description: { type: String, required: true },
-  resumeFile: { type: String, default: null },
-  status: { 
-    type: String, 
-    required: true, 
-    enum: ['pending', 'approved', 'rejected'],
-    default: 'pending'
-  },
-  createdAt: { type: Date, default: Date.now }
-}, {
-  // Add virtual fields for populating related data
+  userId: { type: Number, required: true, index: true },
+  jobId: { type: Number, required: true, index: true },
+  coverLetter: { type: String, required: true },
+  price: { type: Number, required: true },
+  attachments: { type: [String], default: [] },
+  status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
+}, { 
+  timestamps: true,
   toJSON: {
     virtuals: true,
     transform: (_, ret) => {
-      ret.id = ret.id;
+      ret.id = ret._id;
       delete ret._id;
       delete ret.__v;
+      return ret;
+    }
+  },
+  toObject: {
+    virtuals: true,
+    transform: (_, ret) => {
+      ret.id = ret._id;
+      delete ret._id;
+      delete ret.__v;
+      return ret;
     }
   }
 });
 
-// Virtual for user data
-ApplicationSchema.virtual('user', {
-  ref: 'User',
-  localField: 'userId',
-  foreignField: 'id',
-  justOne: true
-});
+// Create indexes for filtering
+ApplicationSchema.index({ status: 1 });
 
-// Virtual for job data
-ApplicationSchema.virtual('job', {
-  ref: 'Job',
-  localField: 'jobId',
-  foreignField: 'id',
-  justOne: true
-});
+// Compound index for unique application per user per job
+ApplicationSchema.index({ userId: 1, jobId: 1 }, { unique: true });
 
-// Create and export the model
-export default mongoose.model<IApplication>('Application', ApplicationSchema);
+// Export the model or create it if it doesn't exist
+export default mongoose.models.Application || mongoose.model<IApplication>('Application', ApplicationSchema);
