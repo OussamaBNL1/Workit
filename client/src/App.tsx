@@ -25,6 +25,7 @@ import About from '@/pages/about';
 import ContactFreelancer from '@/pages/contact-freelancer';
 import Payment from '@/pages/payment';
 import NotFound from '@/pages/not-found';
+import VisitorDemo from '@/pages/visitor-demo';
 
 function Router() {
   const { checkAuth, isAuthenticated, user } = useAuth();
@@ -47,6 +48,7 @@ function Router() {
           <Route path="/auth/login" component={Login} />
           <Route path="/auth/register" component={Register} />
           <Route path="/about" component={About} />
+          <Route path="/visitor-demo" component={VisitorDemo} />
 
           {/* Protected routes */}
           <Route path="/services/create">

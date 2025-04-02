@@ -3,6 +3,7 @@ import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import fileUpload from 'express-fileupload';
 import { Request } from 'express';
+import { log } from '../vite';
 
 // Define the interface for uploaded file data
 interface UploadedFile {
@@ -18,27 +19,36 @@ interface UploadedFile {
  * @returns Object with file path, name and URL
  */
 export async function saveFile(file: fileUpload.UploadedFile, subfolder: string = ''): Promise<UploadedFile> {
-  // Generate a unique filename to prevent overwriting
-  const fileExt = path.extname(file.name);
-  const uniqueFileName = `${uuidv4()}${fileExt}`;
-  
-  // Create the path where the file will be saved
-  const uploadDir = path.join('uploads', subfolder);
-  const filePath = path.join(uploadDir, uniqueFileName);
-
-  // Ensure the directory exists
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
+  // Create uploads directory if it doesn't exist
+  const uploadsDir = path.join(process.cwd(), 'uploads');
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
   }
-
-  // Move the file to the specified path
+  
+  // Create subfolder if provided
+  let targetDir = uploadsDir;
+  if (subfolder) {
+    targetDir = path.join(uploadsDir, subfolder);
+    if (!fs.existsSync(targetDir)) {
+      fs.mkdirSync(targetDir, { recursive: true });
+    }
+  }
+  
+  // Generate unique filename to prevent conflicts
+  const fileExt = path.extname(file.name);
+  const fileName = `${uuidv4()}${fileExt}`;
+  const filePath = path.join(targetDir, fileName);
+  
+  // Save the file
   await file.mv(filePath);
   
-  // Return the file information
+  // Construct the URL path for the file
+  const fileUrl = `/uploads${subfolder ? `/${subfolder}` : ''}/${fileName}`;
+  
   return {
     filePath,
-    fileName: uniqueFileName,
-    fileUrl: `/uploads/${subfolder ? subfolder + '/' : ''}${uniqueFileName}`
+    fileName,
+    fileUrl
   };
 }
 
@@ -52,15 +62,13 @@ export function getFileFromRequest(req: Request, fieldName: string): fileUpload.
   if (!req.files || Object.keys(req.files).length === 0) {
     return null;
   }
-
-  // Check if the field exists in the files object
-  if (!req.files || !req.files[fieldName as keyof typeof req.files]) {
+  
+  const file = req.files[fieldName];
+  if (!file) {
     return null;
   }
-
-  const file = req.files[fieldName as keyof typeof req.files];
   
-  // If the field contains multiple files, return the first one
+  // Handle case when multiple files are uploaded with the same field name
   return Array.isArray(file) ? file[0] : file;
 }
 
@@ -81,10 +89,12 @@ export function validateImageFile(file: fileUpload.UploadedFile): boolean {
  */
 export function validateDocumentFile(file: fileUpload.UploadedFile): boolean {
   const allowedTypes = [
-    'application/pdf',
-    'application/msword',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'text/plain'
+    'application/pdf',                                                        // PDF
+    'application/msword',                                                    // DOC
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // DOCX
+    'application/vnd.ms-excel',                                              // XLS
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',     // XLSX
+    'text/plain'                                                             // TXT
   ];
   return allowedTypes.includes(file.mimetype);
 }

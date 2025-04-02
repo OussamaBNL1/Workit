@@ -183,3 +183,6 @@ export function FileUpload({
     </div>
   );
 }
+
+// Also export as default for compatibility with existing imports
+export default FileUpload;

@@ -1,183 +1,131 @@
-import React from 'react';
-import { AlertTriangle } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { Link, useLocation } from 'wouter';
-import { cn } from '@/lib/utils';
+import { AlertCircle } from "lucide-react";
+import { Link } from "wouter";
+import { Button } from "@/components/ui/button";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+} from "@/components/ui/dialog";
 
-interface VisitorNotificationProps {
-  className?: string;
-  message?: string;
-  inline?: boolean;
-  redirectTo?: string;
-  // For dialog usage
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
+type VisitorNotificationProps = {
+  feature: string;
+  action?: string;
+};
+
+/**
+ * A reusable component that displays a notification for visitors
+ * about features that require authentication
+ */
+export const VisitorNotification = ({
+  feature,
+  action = "use this feature",
+}: VisitorNotificationProps) => {
+  return (
+    <Alert variant="destructive" className="my-4">
+      <AlertCircle className="h-4 w-4" />
+      <AlertTitle>Visitor Access Restricted</AlertTitle>
+      <AlertDescription className="mt-2">
+        <p className="mb-2">
+          You need to be logged in to {action}. Visitors can browse the platform but cannot interact with it (e.g., 
+          creating jobs, ordering services, applying to positions, or leaving reviews).
+        </p>
+        <div className="flex flex-wrap gap-2 mt-4">
+          <Button variant="outline" asChild>
+            <Link href="/auth/login">Log In</Link>
+          </Button>
+          <Button asChild>
+            <Link href="/auth/register">Create an Account</Link>
+          </Button>
+        </div>
+      </AlertDescription>
+    </Alert>
+  );
+};
+
+/**
+ * A toast-style notification component for visitors
+ */
+export const VisitorToastNotification = ({
+  feature,
+  action = "use this feature",
+}: VisitorNotificationProps) => {
+  return (
+    <div className="p-4 rounded-md bg-destructive text-destructive-foreground">
+      <div className="flex items-start gap-2">
+        <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
+        <div>
+          <h3 className="font-medium">Visitor Access Restricted</h3>
+          <p className="text-sm mt-1">
+            You need to be logged in to {action}. Please create an account or log in to continue.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/**
+ * A dialog notification component for visitors
+ */
+interface VisitorNotificationDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  feature?: string;
+  action?: string;
   title?: string;
   description?: string;
 }
 
-/**
- * Component to display a notification for visitor users
- * when they try to access features that require authentication
- */
-export function VisitorNotification({
-  className,
-  message = "This feature requires an account. Please sign in or register to continue.",
-  inline = false,
-  redirectTo = '/auth/login',
+export const VisitorNotificationDialog = ({
+  feature,
+  action = "use this feature",
   open,
   onOpenChange,
-  title = "Visitor Access",
-  description = "You need to sign up or log in to access this feature."
-}: VisitorNotificationProps) {
-  const { toast } = useToast();
-  const [, setLocation] = useLocation();
-
-  const handleClick = () => {
-    setLocation(redirectTo);
-  };
-
-  // For dialog version of the notification
-  if (open !== undefined && onOpenChange !== undefined) {
-    return (
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{title}</DialogTitle>
-            <DialogDescription>{description}</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleClick}>
-              Sign In
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    );
-  }
-
-  // For inline display in components
-  if (inline) {
-    return (
-      <div 
-        className={cn(
-          "flex items-center p-4 gap-3 border rounded-lg bg-amber-50 border-amber-200",
-          className
-        )}
-      >
-        <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0" />
-        <div className="flex-1">
-          <p className="text-sm text-amber-800">{message}</p>
-        </div>
-        <button 
-          onClick={handleClick}
-          className="text-sm font-medium text-amber-600 hover:text-amber-800"
-        >
-          Sign In
-        </button>
-      </div>
-    );
-  }
-
-  // Function to show toast notification
-  const showVisitorToast = () => {
-    toast({
-      title: "Visitor Access",
-      description: message,
-      variant: "destructive",
-      action: (
-        <button 
-          onClick={handleClick}
-          className="bg-amber-100 hover:bg-amber-200 px-3 py-1 rounded text-amber-800"
-        >
-          Sign In
-        </button>
-      ),
-    });
-  };
-
-  // Default return if no display mode specified
-  return { showVisitorToast };
-}
-
-/**
- * Hook to use visitor notifications in functional components
- */
-export function useVisitorNotification(options: VisitorNotificationProps = {}) {
-  const { toast } = useToast();
-  const [, setLocation] = useLocation();
-  
-  const { 
-    message = "This feature requires an account. Please sign in or register to continue.",
-    redirectTo = '/auth/login'
-  } = options;
-
-  const showNotification = () => {
-    toast({
-      title: "Visitor Access",
-      description: message,
-      variant: "destructive",
-      action: (
-        <button 
-          onClick={() => setLocation(redirectTo)}
-          className="bg-amber-100 hover:bg-amber-200 px-3 py-1 rounded text-amber-800"
-        >
-          Sign In
-        </button>
-      ),
-    });
-  };
-
-  return { showNotification };
-}
-
-/**
- * Wrapper component for VisitorNotification that always returns a JSX element
- * This is needed for using the component in a dialog context
- */
-export function VisitorNotificationDialog(props: VisitorNotificationProps) {
-  // Ensure dialog mode by adding default values if not provided
-  const dialogProps = {
-    ...props,
-    open: props.open !== undefined ? props.open : false,
-    onOpenChange: props.onOpenChange || (() => {}),
-    title: props.title || "Visitor Access",
-    description: props.description || "You need to sign up or log in to access this feature."
-  };
-  
+  title = "Visitor Access Restricted",
+  description,
+}: VisitorNotificationDialogProps) => {
   return (
-    <Dialog open={dialogProps.open} onOpenChange={dialogProps.onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{dialogProps.title}</DialogTitle>
-          <DialogDescription>{dialogProps.description}</DialogDescription>
+          <DialogTitle className="flex items-center gap-2 text-destructive">
+            <AlertCircle className="h-5 w-5" />
+            {title}
+          </DialogTitle>
+          <DialogDescription className="pt-2">
+            {description || `You need to be logged in to ${action}. Visitors can browse the platform but cannot interact with it.`}
+          </DialogDescription>
         </DialogHeader>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => dialogProps.onOpenChange(false)}>
-            Cancel
+        <p className="text-sm">
+          Creating an account allows you to access all features including creating jobs, ordering services, 
+          applying to positions, and leaving reviews.
+        </p>
+        <DialogFooter className="flex flex-col sm:flex-row gap-2">
+          <Button
+            variant="outline"
+            className="sm:flex-1"
+            asChild
+            onClick={() => onOpenChange(false)}
+          >
+            <Link href="/auth/login">Log In</Link>
           </Button>
-          <Button onClick={() => {
-            dialogProps.onOpenChange(false);
-            if (props.redirectTo) {
-              window.location.href = props.redirectTo;
-            }
-          }}>
-            Sign In
+          <Button
+            className="sm:flex-1"
+            asChild
+            onClick={() => onOpenChange(false)}
+          >
+            <Link href="/auth/register">Create an Account</Link>
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
-}
+};

@@ -63,6 +63,12 @@ const Navbar: React.FC = () => {
               <Link href="/about" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                 About
               </Link>
+              {isVisitor && (
+                <Link href="/visitor-demo" className="border-transparent text-blue-500 hover:border-blue-300 hover:text-blue-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                  <Eye className="h-3 w-3 mr-1" />
+                  Visitor Demo
+                </Link>
+              )}
             </div>
           </div>
 
@@ -160,6 +166,12 @@ const Navbar: React.FC = () => {
                   <Link href="/about" className="text-base font-medium text-gray-900">
                     About
                   </Link>
+                  {isVisitor && (
+                    <Link href="/visitor-demo" className="text-base font-medium text-blue-600 flex items-center">
+                      <Eye className="h-4 w-4 mr-2" />
+                      Visitor Demo
+                    </Link>
+                  )}
 
                   <div className="pt-4 border-t border-gray-200">
                     {isAuthenticated && user ? (
