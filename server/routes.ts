@@ -1,6 +1,6 @@
 import express, { type Express, type Request, type Response } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { createStorage } from "./storageFactory";
 import { 
   insertUserSchema, 
   loginSchema, 
@@ -45,6 +45,9 @@ function isAuthenticated(req: Request, res: Response, next: Function) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Create storage instance using the factory
+  const storage = createStorage();
+  
   // Setup session
   app.use(session({
     secret: process.env.SESSION_SECRET || "workit-secret",

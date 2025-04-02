@@ -46,7 +46,7 @@ export interface IStorage {
   getApplicationsForJob(jobId: number): Promise<Application[]>;
   getUserApplications(userId: number): Promise<Application[]>;
   createApplication(userId: number, application: InsertApplication): Promise<Application>;
-  updateApplicationStatus(id: number, status: string): Promise<Application | undefined>;
+  updateApplicationStatus(id: number, status: "pending" | "approved" | "rejected"): Promise<Application | undefined>;
   
   // Order related methods
   getOrdersForService(serviceId: number): Promise<Order[]>;
@@ -109,7 +109,17 @@ export class MemStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentUserId++;
     const createdAt = new Date();
-    const user: User = { ...insertUser, id, createdAt };
+    
+    // Ensure required fields are set with defaults
+    const user: User = {
+      ...insertUser,
+      id,
+      createdAt,
+      role: insertUser.role || "freelancer", 
+      bio: insertUser.bio || null,
+      profilePicture: insertUser.profilePicture || null
+    };
+    
     this.users.set(id, user);
     return user;
   }
@@ -153,7 +163,15 @@ export class MemStorage implements IStorage {
   async createService(userId: number, service: InsertService): Promise<Service> {
     const id = this.currentServiceId++;
     const createdAt = new Date();
-    const newService: Service = { ...service, id, userId, createdAt };
+    const newService: Service = { 
+      ...service, 
+      id, 
+      userId, 
+      createdAt,
+      status: service.status || "active",
+      image: service.image || null,
+      deliveryTime: service.deliveryTime || null
+    };
     this.services.set(id, newService);
     return newService;
   }
@@ -197,7 +215,15 @@ export class MemStorage implements IStorage {
   async createJob(userId: number, job: InsertJob): Promise<Job> {
     const id = this.currentJobId++;
     const createdAt = new Date();
-    const newJob: Job = { ...job, id, userId, createdAt };
+    const newJob: Job = { 
+      ...job, 
+      id, 
+      userId, 
+      createdAt,
+      status: job.status || "open",
+      image: job.image || null,
+      location: job.location || null
+    };
     this.jobs.set(id, newJob);
     return newJob;
   }
@@ -234,13 +260,17 @@ export class MemStorage implements IStorage {
       id, 
       userId, 
       createdAt,
-      status: "pending"
+      status: "pending",
+      resumeFile: application.resumeFile || null
     };
     this.applications.set(id, newApplication);
     return newApplication;
   }
   
-  async updateApplicationStatus(id: number, status: string): Promise<Application | undefined> {
+  async updateApplicationStatus(
+    id: number, 
+    status: "pending" | "approved" | "rejected"
+  ): Promise<Application | undefined> {
     const existingApplication = this.applications.get(id);
     if (!existingApplication) {
       return undefined;
@@ -267,7 +297,12 @@ export class MemStorage implements IStorage {
   async createOrder(order: InsertOrder & { sellerId: number }): Promise<Order> {
     const id = this.currentOrderId++;
     const createdAt = new Date();
-    const newOrder: Order = { ...order, id, createdAt };
+    const newOrder: Order = { 
+      ...order, 
+      id, 
+      createdAt,
+      status: "pending" // Default status for new orders
+    };
     this.orders.set(id, newOrder);
     return newOrder;
   }
@@ -282,14 +317,15 @@ export class MemStorage implements IStorage {
   async createReview(review: InsertReview): Promise<Review> {
     const id = this.currentReviewId++;
     const createdAt = new Date();
-    const newReview: Review = { ...review, id, createdAt };
+    const newReview: Review = { 
+      ...review, 
+      id, 
+      createdAt,
+      comment: review.comment || null
+    };
     this.reviews.set(id, newReview);
     return newReview;
   }
 }
 
-// Import MongoDB storage
-import { MongoStorage } from './db/mongoStorage';
-
-// Use MongoDB storage instead of memory storage
-export const storage = new MongoStorage();
+// Storage instance will be created by the factory function in storageFactory.ts

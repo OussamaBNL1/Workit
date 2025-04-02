@@ -1,8 +1,10 @@
 import mongoose from 'mongoose';
 import { log } from '../vite';
 
-// MongoDB connection string - use DATABASE_URL environment variable if available
-const MONGODB_URI = process.env.DATABASE_URL || process.env.MONGODB_URI || 'mongodb://localhost:27017/workit';
+// MongoDB connection string - use MONGODB_URI environment variable
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/workit';
+
+// Don't use DATABASE_URL as it might be a PostgreSQL connection string
 
 // Cached connection
 interface MongoConnection {

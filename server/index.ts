@@ -3,7 +3,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import fileUpload from "express-fileupload";
 import path from "path";
-import { connectToMongoDB } from "./db/mongodb";
+import { createStorage } from "./storageFactory";
 
 const app = express();
 app.use(express.json());
@@ -49,14 +49,10 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  try {
-    // Connect to MongoDB
-    await connectToMongoDB();
-    log("MongoDB connection established", "server");
-  } catch (error) {
-    log(`Failed to connect to MongoDB: ${error}`, "server");
-    process.exit(1);
-  }
+  // Initialize storage based on environment
+  const storage = createStorage();
+  const storageType = process.env.DATABASE_URL ? 'PostgreSQL database' : 'in-memory storage';
+  log(`Using ${storageType} for data persistence`, "server");
   
   const server = await registerRoutes(app);
 

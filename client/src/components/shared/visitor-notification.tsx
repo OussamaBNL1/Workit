@@ -148,5 +148,36 @@ export function useVisitorNotification(options: VisitorNotificationProps = {}) {
  * This is needed for using the component in a dialog context
  */
 export function VisitorNotificationDialog(props: VisitorNotificationProps) {
-  return <VisitorNotification {...props} />;
+  // Ensure dialog mode by adding default values if not provided
+  const dialogProps = {
+    ...props,
+    open: props.open !== undefined ? props.open : false,
+    onOpenChange: props.onOpenChange || (() => {}),
+    title: props.title || "Visitor Access",
+    description: props.description || "You need to sign up or log in to access this feature."
+  };
+  
+  return (
+    <Dialog open={dialogProps.open} onOpenChange={dialogProps.onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{dialogProps.title}</DialogTitle>
+          <DialogDescription>{dialogProps.description}</DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => dialogProps.onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button onClick={() => {
+            dialogProps.onOpenChange(false);
+            if (props.redirectTo) {
+              window.location.href = props.redirectTo;
+            }
+          }}>
+            Sign In
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
 }
