@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import VisitorNotification from '@/components/shared/visitor-notification';
+import { VisitorNotificationDialog } from '@/components/shared/visitor-notification';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Form,
@@ -459,7 +459,7 @@ const ServiceDetail: React.FC = () => {
       </Dialog>
       
       {/* Visitor Notification */}
-      <VisitorNotification
+      <VisitorNotificationDialog
         open={visitorNotifyOpen}
         onOpenChange={setVisitorNotifyOpen}
         title={visitorNotifyMessage.title}

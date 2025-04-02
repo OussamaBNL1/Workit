@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import VisitorNotification from '@/components/shared/visitor-notification';
+import { VisitorNotification } from '@/components/shared/visitor-notification';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Form,
@@ -30,7 +30,7 @@ import { useToast } from '@/hooks/use-toast';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { JobWithUser } from '@/lib/types';
 import { useAuth } from '@/lib/auth';
-import FileUpload from '@/components/ui/file-upload';
+import { FileUpload } from '@/components/ui/file-upload';
 import { formatDistanceToNow } from 'date-fns';
 
 // Define application form schema

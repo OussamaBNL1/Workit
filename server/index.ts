@@ -1,10 +1,22 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import fileUpload from "express-fileupload";
+import path from "path";
+import { connectToMongoDB } from "./db/mongodb";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Setup file upload middleware
+app.use(fileUpload({
+  createParentPath: true,
+  limits: { fileSize: 50 * 1024 * 1024 } // 50MB limit
+}));
+
+// Serve uploaded files statically
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -37,6 +49,15 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  try {
+    // Connect to MongoDB
+    await connectToMongoDB();
+    log("MongoDB connection established", "server");
+  } catch (error) {
+    log(`Failed to connect to MongoDB: ${error}`, "server");
+    process.exit(1);
+  }
+  
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
