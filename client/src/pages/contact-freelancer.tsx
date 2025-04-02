@@ -32,9 +32,9 @@ const ContactFreelancer: React.FC = () => {
           <Button 
             variant="outline" 
             className="mr-2"
-            onClick={() => setLocation(`/profile/${params?.id}`)}
+            onClick={() => window.history.back()}
           >
-            View Freelancer Profile
+            Back to Service
           </Button>
           <Button onClick={() => setLocation('/')}>
             Return to Home

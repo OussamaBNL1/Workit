@@ -173,7 +173,7 @@ const About: React.FC = () => {
                     <Mail className="h-6 w-6 text-primary mr-3" />
                     <div>
                       <p className="font-medium">Email</p>
-                      <p className="text-gray-500">hi@workit@gmail.com</p>
+                      <p className="text-gray-500">hi@workit.gmail.com</p>
                     </div>
                   </li>
                   <li className="flex items-start">

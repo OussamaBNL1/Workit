@@ -94,8 +94,8 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold tracking-tight text-gray-900">Featured Services</h2>
-            <Link href="/services">
-              <a className="text-primary hover:text-primary-600 text-sm font-medium">View all services →</a>
+            <Link href="/services" className="text-primary hover:text-primary-600 text-sm font-medium">
+              View all services →
             </Link>
           </div>
 
@@ -120,8 +120,8 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold tracking-tight text-gray-900">Featured Jobs</h2>
-            <Link href="/jobs">
-              <a className="text-primary hover:text-primary-600 text-sm font-medium">View all jobs →</a>
+            <Link href="/jobs" className="text-primary hover:text-primary-600 text-sm font-medium">
+              View all jobs →
             </Link>
           </div>
 

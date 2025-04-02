@@ -5,17 +5,20 @@ import { User } from './types';
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
+  isVisitor: boolean;
   isLoading: boolean;
   error: string | null;
   login: (username: string, password: string) => Promise<void>;
   register: (userData: any) => Promise<void>;
   logout: () => Promise<void>;
+  continueAsVisitor: () => void;
   checkAuth: () => Promise<void>;
 }
 
 export const useAuth = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
+  isVisitor: false,
   isLoading: true,
   error: null,
   
@@ -47,27 +50,55 @@ export const useAuth = create<AuthState>((set) => ({
     try {
       set({ isLoading: true });
       await apiRequest('POST', '/api/auth/logout');
-      set({ user: null, isAuthenticated: false, isLoading: false });
+      set({ user: null, isAuthenticated: false, isVisitor: false, isLoading: false });
     } catch (error: any) {
       set({ error: error.message, isLoading: false });
     }
   },
   
+  continueAsVisitor: () => {
+    set({ 
+      user: null, 
+      isAuthenticated: false, 
+      isVisitor: true, 
+      isLoading: false, 
+      error: null 
+    });
+  },
+  
   checkAuth: async () => {
     try {
-      set({ isLoading: true });
+      set((state) => ({ ...state, isLoading: true }));
       const res = await fetch('/api/auth/me', {
         credentials: 'include'
       });
       
       if (res.ok) {
         const user = await res.json();
-        set({ user, isAuthenticated: !!user, isLoading: false });
+        set((state) => ({ 
+          ...state, 
+          user, 
+          isAuthenticated: !!user, 
+          isVisitor: false, // If authenticated, not a visitor
+          isLoading: false 
+        }));
       } else {
-        set({ user: null, isAuthenticated: false, isLoading: false });
+        // If not authenticated, keep visitor state as is
+        set((state) => ({ 
+          ...state, 
+          user: null, 
+          isAuthenticated: false, 
+          isLoading: false 
+        }));
       }
     } catch (error) {
-      set({ user: null, isAuthenticated: false, isLoading: false });
+      // If error, keep visitor state as is
+      set((state) => ({ 
+        ...state, 
+        user: null, 
+        isAuthenticated: false, 
+        isLoading: false 
+      }));
     }
   }
 }));

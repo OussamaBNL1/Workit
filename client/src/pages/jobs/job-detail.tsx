@@ -12,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import VisitorNotification from '@/components/shared/visitor-notification';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Form,
@@ -44,8 +45,13 @@ const JobDetail: React.FC = () => {
   const [, params] = useRoute<{ id: string }>('/jobs/:id');
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isVisitor } = useAuth();
   const [applicationDialogOpen, setApplicationDialogOpen] = useState(false);
+  const [visitorNotifyOpen, setVisitorNotifyOpen] = useState(false);
+  const [visitorNotifyMessage, setVisitorNotifyMessage] = useState({
+    title: '',
+    description: ''
+  });
 
   const jobId = params?.id ? parseInt(params.id) : 0;
 
@@ -114,6 +120,15 @@ const JobDetail: React.FC = () => {
 
   // Handle apply button click
   const handleApply = () => {
+    if (isVisitor) {
+      setVisitorNotifyMessage({
+        title: 'Job Applications Unavailable in Visitor Mode',
+        description: 'You need to sign up or log in to apply for jobs on WorkiT.'
+      });
+      setVisitorNotifyOpen(true);
+      return;
+    }
+    
     if (!isAuthenticated) {
       toast({
         title: 'Authentication Required',
@@ -138,7 +153,15 @@ const JobDetail: React.FC = () => {
 
   // Handle view profile button click
   const handleViewProfile = () => {
-    setLocation(`/profile/${job?.userId}`);
+    if (isVisitor) {
+      // Visitors can view profiles, no restriction needed
+      // In a real app, we'd have user-specific profiles
+      setLocation(`/profile`);
+      return;
+    }
+    
+    // For now, redirect to the profile page as we don't have user-specific profile pages
+    setLocation(`/profile`);
   };
 
   // Format the createdAt date to "X days/hours ago"
@@ -378,6 +401,14 @@ const JobDetail: React.FC = () => {
           </Form>
         </DialogContent>
       </Dialog>
+      
+      {/* Visitor Notification */}
+      <VisitorNotification
+        open={visitorNotifyOpen}
+        onOpenChange={setVisitorNotifyOpen}
+        title={visitorNotifyMessage.title}
+        description={visitorNotifyMessage.description}
+      />
     </div>
   );
 };

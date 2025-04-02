@@ -18,12 +18,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { Menu, PlusSquare, UserCircle } from 'lucide-react';
+import { Eye, Menu, PlusSquare, UserCircle } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 
 const Navbar: React.FC = () => {
   const [, setLocation] = useLocation();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isVisitor, logout } = useAuth();
   const [createMenuOpen, setCreateMenuOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -46,30 +46,22 @@ const Navbar: React.FC = () => {
           {/* Logo and desktop navigation */}
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/">
-                <a className="text-2xl font-bold text-primary">WorkiT</a>
+              <Link href="/" className="text-2xl font-bold text-primary">
+                WorkiT
               </Link>
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              <Link href="/">
-                <a className="border-primary text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                  Home
-                </a>
+              <Link href="/" className="border-primary text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                Home
               </Link>
-              <Link href="/services">
-                <a className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                  Services
-                </a>
+              <Link href="/services" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                Services
               </Link>
-              <Link href="/jobs">
-                <a className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                  Jobs
-                </a>
+              <Link href="/jobs" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                Jobs
               </Link>
-              <Link href="/about">
-                <a className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                  About
-                </a>
+              <Link href="/about" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                About
               </Link>
             </div>
           </div>
@@ -122,6 +114,17 @@ const Navbar: React.FC = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
+            ) : isVisitor ? (
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-sm">
+                  <Eye className="h-4 w-4 mr-2" />
+                  <span>Visitor Mode</span>
+                </div>
+                <Button variant="ghost" onClick={() => setLocation('/auth/login')}>
+                  Log in
+                </Button>
+                <Button onClick={() => setLocation('/auth/register')}>Sign up</Button>
+              </div>
             ) : (
               <div className="flex items-center space-x-4">
                 <Button variant="ghost" onClick={() => setLocation('/auth/login')}>
@@ -145,17 +148,17 @@ const Navbar: React.FC = () => {
                   <SheetTitle>Menu</SheetTitle>
                 </SheetHeader>
                 <div className="py-4 flex flex-col space-y-4">
-                  <Link href="/">
-                    <a className="text-base font-medium text-gray-900">Home</a>
+                  <Link href="/" className="text-base font-medium text-gray-900">
+                    Home
                   </Link>
-                  <Link href="/services">
-                    <a className="text-base font-medium text-gray-900">Services</a>
+                  <Link href="/services" className="text-base font-medium text-gray-900">
+                    Services
                   </Link>
-                  <Link href="/jobs">
-                    <a className="text-base font-medium text-gray-900">Jobs</a>
+                  <Link href="/jobs" className="text-base font-medium text-gray-900">
+                    Jobs
                   </Link>
-                  <Link href="/about">
-                    <a className="text-base font-medium text-gray-900">About</a>
+                  <Link href="/about" className="text-base font-medium text-gray-900">
+                    About
                   </Link>
 
                   <div className="pt-4 border-t border-gray-200">
@@ -172,21 +175,43 @@ const Navbar: React.FC = () => {
                           </div>
                         </div>
                         <div className="flex flex-col space-y-2">
-                          <Link href="/profile">
-                            <a className="text-base font-medium text-gray-900">Profile</a>
+                          <Link href="/profile" className="text-base font-medium text-gray-900">
+                            Profile
                           </Link>
                           {user.role === 'freelancer' && (
-                            <Link href="/services/create">
-                              <a className="text-base font-medium text-gray-900">Create Service</a>
+                            <Link href="/services/create" className="text-base font-medium text-gray-900">
+                              Create Service
                             </Link>
                           )}
                           {user.role === 'employer' && (
-                            <Link href="/jobs/create">
-                              <a className="text-base font-medium text-gray-900">Post a Job</a>
+                            <Link href="/jobs/create" className="text-base font-medium text-gray-900">
+                              Post a Job
                             </Link>
                           )}
                           <Button variant="destructive" onClick={handleLogout}>
                             Logout
+                          </Button>
+                        </div>
+                      </>
+                    ) : isVisitor ? (
+                      <>
+                        <div className="flex items-center space-x-2 mb-4 bg-blue-50 text-blue-600 p-2 rounded-md">
+                          <Eye className="h-4 w-4" />
+                          <span className="text-sm font-medium">Visitor Mode</span>
+                        </div>
+                        <div className="flex flex-col space-y-2">
+                          <Button
+                            variant="outline"
+                            onClick={() => setLocation('/auth/login')}
+                            className="w-full"
+                          >
+                            Log in
+                          </Button>
+                          <Button
+                            onClick={() => setLocation('/auth/register')}
+                            className="w-full"
+                          >
+                            Sign up
                           </Button>
                         </div>
                       </>

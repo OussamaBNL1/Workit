@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth';
+import { Eye } from 'lucide-react';
 
 import {
   Card,
@@ -37,7 +38,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 const Login: React.FC = () => {
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
-  const { login, isAuthenticated, isLoading } = useAuth();
+  const { login, continueAsVisitor, isAuthenticated, isLoading } = useAuth();
 
   // Initialize form
   const form = useForm<LoginFormValues>({
@@ -71,6 +72,16 @@ const Login: React.FC = () => {
         variant: 'destructive',
       });
     }
+  };
+  
+  // Handle continue as visitor
+  const handleContinueAsVisitor = () => {
+    continueAsVisitor();
+    toast({
+      title: 'Visitor Mode',
+      description: 'You are now browsing as a visitor. Some features will be limited.',
+    });
+    setLocation('/');
   };
 
   return (
@@ -131,7 +142,16 @@ const Login: React.FC = () => {
 
           <Separator className="my-4" />
 
-          <div className="text-center">
+          <Button
+            variant="outline"
+            className="w-full flex items-center justify-center gap-2"
+            onClick={handleContinueAsVisitor}
+          >
+            <Eye className="w-4 h-4" />
+            Continue as Visitor
+          </Button>
+
+          <div className="mt-4 text-center">
             <p className="text-sm text-muted-foreground">
               Don't have an account?{' '}
               <Button

@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import VisitorNotification from '@/components/shared/visitor-notification';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Form,
@@ -41,8 +42,13 @@ const ServiceDetail: React.FC = () => {
   const [, params] = useRoute<{ id: string }>('/services/:id');
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isVisitor } = useAuth();
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  const [visitorNotifyOpen, setVisitorNotifyOpen] = useState(false);
+  const [visitorNotifyMessage, setVisitorNotifyMessage] = useState({
+    title: '',
+    description: ''
+  });
 
   const serviceId = params?.id ? parseInt(params.id) : 0;
 
@@ -106,6 +112,15 @@ const ServiceDetail: React.FC = () => {
 
   // Handle order button click
   const handleOrderNow = () => {
+    if (isVisitor) {
+      setVisitorNotifyMessage({
+        title: 'Order Unavailable in Visitor Mode',
+        description: 'You need to sign up or log in to order services on WorkiT.'
+      });
+      setVisitorNotifyOpen(true);
+      return;
+    }
+
     if (!isAuthenticated) {
       toast({
         title: 'Authentication Required',
@@ -130,6 +145,15 @@ const ServiceDetail: React.FC = () => {
 
   // Handle contact button click
   const handleContactFreelancer = () => {
+    if (isVisitor) {
+      setVisitorNotifyMessage({
+        title: 'Messaging Unavailable in Visitor Mode',
+        description: 'You need to sign up or log in to contact freelancers on WorkiT.'
+      });
+      setVisitorNotifyOpen(true);
+      return;
+    }
+
     if (!isAuthenticated) {
       toast({
         title: 'Authentication Required',
@@ -145,7 +169,15 @@ const ServiceDetail: React.FC = () => {
 
   // Handle view profile button click
   const handleViewProfile = () => {
-    setLocation(`/profile/${service?.userId}`);
+    if (isVisitor) {
+      // Visitors can view profiles, no restriction needed
+      // In a real app, we'd have user-specific profiles
+      setLocation(`/profile`);
+      return;
+    }
+    
+    // For now, redirect to the profile page as we don't have user-specific profile pages
+    setLocation(`/profile`);
   };
 
   // Calculate average rating
@@ -247,6 +279,20 @@ const ServiceDetail: React.FC = () => {
                   <h2 className="text-xl font-semibold">Reviews</h2>
                   {isAuthenticated && user?.id !== service.userId && (
                     <Button variant="outline" onClick={() => setReviewDialogOpen(true)}>
+                      Write a Review
+                    </Button>
+                  )}
+                  {isVisitor && (
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        setVisitorNotifyMessage({
+                          title: 'Reviews Unavailable in Visitor Mode',
+                          description: 'You need to sign up or log in to write reviews on WorkiT.'
+                        });
+                        setVisitorNotifyOpen(true);
+                      }}
+                    >
                       Write a Review
                     </Button>
                   )}
@@ -411,6 +457,14 @@ const ServiceDetail: React.FC = () => {
           </Form>
         </DialogContent>
       </Dialog>
+      
+      {/* Visitor Notification */}
+      <VisitorNotification
+        open={visitorNotifyOpen}
+        onOpenChange={setVisitorNotifyOpen}
+        title={visitorNotifyMessage.title}
+        description={visitorNotifyMessage.description}
+      />
     </div>
   );
 };
