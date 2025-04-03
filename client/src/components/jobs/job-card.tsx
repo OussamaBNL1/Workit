@@ -89,10 +89,8 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
               </span>
             </div>
             <div className="mt-4">
-              <Link href={`/jobs/${id}`}>
-                <a className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                  View Details
-                </a>
+              <Link href={`/jobs/${id}`} className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                View Details
               </Link>
             </div>
           </div>

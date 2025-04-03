@@ -50,7 +50,8 @@ const ServiceDetail: React.FC = () => {
     description: ''
   });
 
-  const serviceId = params?.id ? parseInt(params.id) : 0;
+  // Don't attempt to convert MongoDB ObjectID to number
+  const serviceId = params?.id || '';
 
   // Fetch service details
   const {

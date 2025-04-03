@@ -51,10 +51,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Since createStorage is now async, we need to await it
   const storage = await createStorage();
   // Setup session
+  const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
+  
   app.use(session({
     secret: process.env.SESSION_SECRET || "workit-secret",
     resave: false,
     saveUninitialized: false,
+    cookie: { 
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: THIRTY_DAYS,
+      httpOnly: true,
+      sameSite: 'lax'
+    }
   }));
 
   // Initialize passport
@@ -294,7 +302,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/services/:id', async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      // Don't convert id to integer if it's a MongoDB ObjectID
+      let id = req.params.id;
+      
+      // Only convert to integer if it's not a MongoDB ObjectID format
+      if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+        id = parseInt(id) as any;
+      }
+      
       const service = await storage.getService(id);
       if (!service) {
         return res.status(404).json({ message: "Service not found" });
@@ -309,6 +324,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(service);
     } catch (error: any) {
+      console.error('Error fetching service:', error);
       res.status(500).json({ message: error.message });
     }
   });
@@ -388,7 +404,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/jobs/:id', async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      // Don't convert id to integer if it's a MongoDB ObjectID
+      let id = req.params.id;
+      
+      // Only convert to integer if it's not a MongoDB ObjectID format
+      if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+        id = parseInt(id) as any;
+      }
+      
       const job = await storage.getJob(id);
       if (!job) {
         return res.status(404).json({ message: "Job not found" });
@@ -403,6 +426,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(job);
     } catch (error: any) {
+      console.error('Error fetching job:', error);
       res.status(500).json({ message: error.message });
     }
   });
@@ -650,8 +674,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Review routes
   app.get('/api/services/:id/reviews', async (req, res) => {
     try {
-      const serviceId = parseInt(req.params.id);
-      const reviews = await storage.getReviewsForService(serviceId);
+      // Don't convert id to integer if it's a MongoDB ObjectID
+      let id = req.params.id;
+      
+      // Only convert to integer if it's not a MongoDB ObjectID format
+      if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+        id = parseInt(id) as any;
+      }
+      
+      const reviews = await storage.getReviewsForService(id);
       
       // Get user data for each review
       const reviewsWithUsers = await Promise.all(reviews.map(async (review) => {
@@ -664,13 +695,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(reviewsWithUsers);
     } catch (error: any) {
+      console.error('Error fetching reviews:', error);
       res.status(500).json({ message: error.message });
     }
   });
 
   app.post('/api/services/:id/reviews', isAuthenticated, async (req, res) => {
     try {
-      const serviceId = parseInt(req.params.id);
+      // Don't convert id to integer if it's a MongoDB ObjectID
+      let serviceId = req.params.id;
+      
+      // Only convert to integer if it's not a MongoDB ObjectID format
+      if (!serviceId.match(/^[0-9a-fA-F]{24}$/)) {
+        serviceId = parseInt(serviceId) as any;
+      }
+      
       const userId = (req.user as any).id;
       
       // Get the service
@@ -693,6 +732,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const review = await storage.createReview(reviewData);
       res.status(201).json(review);
     } catch (error: any) {
+      console.error('Error creating review:', error);
       res.status(400).json({ message: error.message });
     }
   });

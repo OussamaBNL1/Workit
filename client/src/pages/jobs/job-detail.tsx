@@ -53,7 +53,8 @@ const JobDetail: React.FC = () => {
     description: ''
   });
 
-  const jobId = params?.id ? parseInt(params.id) : 0;
+  // Don't attempt to convert MongoDB ObjectID to number
+  const jobId = params?.id || '';
 
   // Fetch job details
   const {

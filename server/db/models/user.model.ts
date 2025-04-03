@@ -6,6 +6,8 @@ export interface IUser extends Document, Omit<User, 'id'> {
 }
 
 const UserSchema: Schema = new Schema({
+  // For compatibility with numeric IDs (from in-memory storage or imported data)
+  id: { type: Number, sparse: true },
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   email: { type: String, required: true, unique: true },
@@ -20,7 +22,9 @@ const UserSchema: Schema = new Schema({
   toJSON: {
     virtuals: true,
     transform: (_, ret) => {
-      ret.id = ret._id;
+      if (!ret.id) {
+        ret.id = ret._id;
+      }
       delete ret.password; // Remove password
       delete ret._id;
       delete ret.__v;
@@ -30,7 +34,9 @@ const UserSchema: Schema = new Schema({
   toObject: {
     virtuals: true,
     transform: (_, ret) => {
-      ret.id = ret._id;
+      if (!ret.id) {
+        ret.id = ret._id;
+      }
       delete ret.password; // Remove password
       delete ret._id;
       delete ret.__v;

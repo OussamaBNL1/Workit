@@ -68,10 +68,8 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => {
         </div>
         <div className="mt-3 flex justify-between items-center">
           <p className="text-lg font-semibold text-gray-900">${price}</p>
-          <Link href={`/services/${id}`}>
-            <a className="text-primary hover:text-primary-600 text-sm font-medium">
-              View Details
-            </a>
+          <Link href={`/services/${id}`} className="text-primary hover:text-primary-600 text-sm font-medium">
+            View Details
           </Link>
         </div>
       </CardContent>
