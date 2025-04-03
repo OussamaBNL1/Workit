@@ -109,28 +109,58 @@ export class MongoStorage implements IStorage {
     }
   }
 
-  async updateUser(id: number, userData: Partial<User>): Promise<User | undefined> {
+  async updateUser(id: any, userData: Partial<User>): Promise<User | undefined> {
     try {
       await this.ensureConnection();
-      // Try to update by numeric id field first
-      let updatedUser = await UserModel.findOneAndUpdate(
-        { id },
-        { $set: userData },
-        { new: true }
-      );
+      let updatedUser;
       
-      // If not found, try to update by MongoDB _id
-      if (!updatedUser) {
+      // Handle MongoDB ObjectId strings
+      if (typeof id === 'string' && id.match(/^[0-9a-fA-F]{24}$/)) {
+        log(`Attempting to update user with MongoDB ObjectId: ${id}`, 'storage');
+        updatedUser = await UserModel.findByIdAndUpdate(
+          id,
+          { $set: userData },
+          { new: true }
+        );
+      } else {
+        // Handle numeric IDs
         try {
-          log(`User not found with numeric id ${id} for update, trying MongoDB _id`, 'storage');
+          // Try by MongoDB's _id first
           updatedUser = await UserModel.findByIdAndUpdate(
             id,
             { $set: userData },
             { new: true }
           );
+          
+          // If not found, try by numeric id field
+          if (!updatedUser) {
+            const numId = parseInt(String(id), 10);
+            if (!isNaN(numId)) {
+              log(`User not found with _id ${id}, trying numeric id ${numId}`, 'storage');
+              updatedUser = await UserModel.findOneAndUpdate(
+                { id: numId },
+                { $set: userData },
+                { new: true }
+              );
+            }
+          }
         } catch (err) {
-          // Ignore this error, it's just a fallback attempt
+          // Try one more approach with numeric id
+          const numId = parseInt(String(id), 10);
+          if (!isNaN(numId)) {
+            log(`Error with _id update, trying numeric id ${numId}`, 'storage');
+            updatedUser = await UserModel.findOneAndUpdate(
+              { id: numId },
+              { $set: userData },
+              { new: true }
+            );
+          }
         }
+      }
+      
+      if (!updatedUser) {
+        log(`Could not find user with id ${id} to update`, 'storage');
+        return undefined;
       }
       
       return convertDocument<User>(updatedUser);

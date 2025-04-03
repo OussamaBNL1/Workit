@@ -1,0 +1,43 @@
+2:27:44 PM [express] GET /api/auth/me 401 in 8ms
+2:27:44 PM [express] GET /api/system/info 200 in 8ms :: {"databaseType":"MongoDB Memory Server","nod…
+2:27:46 PM [mongodb] Created new MongoDB Memory Server: mongodb://127.0.0.1:51883/
+2:27:46 PM [mongodb] Attempting to connect to MongoDB at URI: mongodb://127.0.0.1:51883/
+2:27:46 PM [mongodb] Created new MongoDB Memory Server: mongodb://127.0.0.1:51884/
+2:27:46 PM [mongodb] Attempting to connect to MongoDB at URI: mongodb://127.0.0.1:51884/
+2:27:46 PM [mongodb] Error connecting to MongoDB: Can't call `openUri()` on an active connection with different connection strings. Make sure you aren't calling `mongoose.connect()` multiple times. See: https://mongoosejs.com/docs/connections.html#multiple_connections
+2:27:46 PM [mongodb] Connection string might be invalid or MongoDB server is not accessible.
+2:27:46 PM [storage] MongoDB connection error: Can't call `openUri()` on an active connection with different connection strings. Make sure you aren't calling `mongoose.connect()` multiple times. See: https://mongoosejs.com/docs/connections.html#multiple_connections
+2:27:46 PM [storage] Error getting jobs: MongoDB connection failed: Can't call `openUri()` on an active connection with different connection strings. Make sure you aren't calling `mongoose.connect()` multiple times. See: https://mongoosejs.com/docs/connections.html#multiple_connections
+2:27:46 PM [express] GET /api/jobs 304 in 1760ms :: []
+2:27:46 PM [mongodb] Successfully connected to MongoDB
+2:27:46 PM [mongodb] MongoDB version: 7.0.14
+2:27:46 PM [express] GET /api/services 304 in 1879ms :: []
+2:27:46 PM [mongodb] Database: test, Collections: 1
+2:28:22 PM [express] POST /api/auth/register 201 in 99ms :: {"username":"oussama","email":"oussama@g…
+Error: Failed to deserialize user out of session
+    at pass (D:\replit.com\26\CodeCraft\node_modules\passport\lib\authenticator.js:359:19)
+    at deserialized (D:\replit.com\26\CodeCraft\node_modules\passport\lib\authenticator.js:364:7)
+    at <anonymous> (D:\replit.com\26\CodeCraft\server\routes.ts:104:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Error: Failed to deserialize user out of session
+    at pass (D:\replit.com\26\CodeCraft\node_modules\passport\lib\authenticator.js:359:19)
+    at deserialized (D:\replit.com\26\CodeCraft\node_modules\passport\lib\authenticator.js:364:7)
+    at <anonymous> (D:\replit.com\26\CodeCraft\server\routes.ts:104:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2:28:33 PM [express] PUT /api/users/67ee8cf697c7e4b41b03dd47 500 in 4ms :: {"message":"Failed to des…
+Error: Failed to deserialize user out of session
+    at pass (D:\replit.com\26\CodeCraft\node_modules\passport\lib\authenticator.js:359:19)
+    at deserialized (D:\replit.com\26\CodeCraft\node_modules\passport\lib\authenticator.js:364:7)
+    at <anonymous> (D:\replit.com\26\CodeCraft\server\routes.ts:104:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Error: Failed to deserialize user out of session
+    at pass (D:\replit.com\26\CodeCraft\node_modules\passport\lib\authenticator.js:359:19)
+    at deserialized (D:\replit.com\26\CodeCraft\node_modules\passport\lib\authenticator.js:364:7)
+    at <anonymous> (D:\replit.com\26\CodeCraft\server\routes.ts:104:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2:28:56 PM [express] POST /api/services 500 in 3ms :: {"message":"Failed to deserialize user out of …
+Error: Failed to deserialize user out of session
+    at pass (D:\replit.com\26\CodeCraft\node_modules\passport\lib\authenticator.js:359:19)
+    at deserialized (D:\replit.com\26\CodeCraft\node_modules\passport\lib\authenticator.js:364:7)
+    at <anonymous> (D:\replit.com\26\CodeCraft\server\routes.ts:104:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)

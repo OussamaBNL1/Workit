@@ -98,9 +98,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     done(null, user.id);
   });
 
-  passport.deserializeUser(async (id: number, done) => {
+  passport.deserializeUser(async (id: any, done) => {
     try {
-      const user = await storage.getUser(id);
+      // Handle both string and number IDs
+      let user;
+      
+      // MongoDB IDs might be strings (objectId) instead of numbers
+      if (typeof id === 'string' && id.match(/^[0-9a-fA-F]{24}$/)) {
+        // If it looks like a MongoDB ObjectId, use it as is
+        // @ts-ignore - we're handling MongoDB ObjectIDs for compatibility
+        user = await storage.getUser(id);
+      } else {
+        // If it's a number ID or some other format
+        const numId = parseInt(String(id), 10);
+        if (!isNaN(numId)) {
+          user = await storage.getUser(numId);
+        }
+      }
+      
+      if (!user) {
+        return done(new Error('User not found'), null);
+      }
+      
       done(null, user);
     } catch (error) {
       done(error);

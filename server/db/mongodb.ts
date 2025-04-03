@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { log } from '../vite';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import path from 'path';
 
 // Create a cached connection variable 
 interface MongoConnection {
@@ -9,6 +10,14 @@ interface MongoConnection {
   mongoMemoryServer?: MongoMemoryServer;
   isConnecting: boolean;
   connectionURI?: string;
+}
+
+// Define mongoose connection states as they are in mongoose
+const MONGOOSE_CONNECTION_STATES = {
+  disconnected: 0,
+  connected: 1,
+  connecting: 2,
+  disconnecting: 3,
 }
 
 let cachedConnection: MongoConnection = { 
@@ -24,6 +33,13 @@ let cachedConnection: MongoConnection = {
  */
 export async function connectToMongoDB() {
   // If we already have a connection, return it
+  if (mongoose.connection.readyState === MONGOOSE_CONNECTION_STATES.connected) {
+    log('Mongoose already has an active connection', 'mongodb');
+    cachedConnection.conn = mongoose;
+    return cachedConnection.conn;
+  }
+  
+  // If we have a cached connection, return it
   if (cachedConnection.conn) {
     return cachedConnection.conn;
   }
@@ -54,7 +70,7 @@ export async function connectToMongoDB() {
     // Check if we already have a memory server instance
     if (!cachedConnection.mongoMemoryServer) {
       try {
-        // Create an in-memory MongoDB server only once
+        // Create a regular in-memory MongoDB server without persistence
         const mongoMemoryServer = await MongoMemoryServer.create();
         MONGODB_URI = mongoMemoryServer.getUri();
         cachedConnection.mongoMemoryServer = mongoMemoryServer;
@@ -87,7 +103,7 @@ export async function connectToMongoDB() {
   };
 
   // Check if mongoose is already connected
-  if (mongoose.connection.readyState === 1) {
+  if (mongoose.connection.readyState === MONGOOSE_CONNECTION_STATES.connected) {
     log('Mongoose already has an active connection, reusing it', 'mongodb');
     
     // Check if we're trying to connect to a different URI
