@@ -3,6 +3,7 @@ export interface User {
   id: number;
   username: string;
   email: string;
+  fullName: string;
   role: 'freelancer' | 'employer';
   bio?: string;
   profilePicture?: string;
@@ -94,6 +95,7 @@ export interface LoginForm {
 export interface RegisterForm {
   username: string;
   email: string;
+  fullName: string;
   password: string;
   confirmPassword: string;
   role: 'freelancer' | 'employer';

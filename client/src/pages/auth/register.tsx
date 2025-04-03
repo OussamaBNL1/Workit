@@ -35,6 +35,7 @@ import {
 const registerSchema = z.object({
   username: z.string().min(3, 'Username must be at least 3 characters'),
   email: z.string().email('Please enter a valid email address'),
+  fullName: z.string().min(1, 'Full name is required'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   confirmPassword: z.string().min(6, 'Password must be at least 6 characters'),
   role: z.enum(['freelancer', 'employer'], {
@@ -58,6 +59,7 @@ const Register: React.FC = () => {
     defaultValues: {
       username: '',
       email: '',
+      fullName: '',
       password: '',
       confirmPassword: '',
       role: 'freelancer',
@@ -125,6 +127,23 @@ const Register: React.FC = () => {
                       <Input 
                         type="email" 
                         placeholder="Enter your email address" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="fullName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Full Name</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="Enter your full name" 
                         {...field} 
                       />
                     </FormControl>
