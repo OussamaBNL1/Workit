@@ -5,6 +5,7 @@ import fileUpload from "express-fileupload";
 import path from "path";
 import { createStorage } from "./storageFactory";
 import * as dotenv from "dotenv";
+import { startMongoDBServer } from "./db/mongodb-startup";
 
 const app = express();
 app.use(express.json());
@@ -77,8 +78,21 @@ app.use((req, res, next) => {
     log("Removed DATABASE_URL to avoid PostgreSQL activation", "server");
   }
   
+  // Start MongoDB if necessary
+  if (process.env.USE_MONGODB === 'true' && process.env.USE_MONGODB_MEMORY_SERVER !== 'true') {
+    log('Starting MongoDB server...', 'server');
+    const mongoStarted = await startMongoDBServer();
+    if (mongoStarted) {
+      log('MongoDB server started successfully', 'server');
+    } else {
+      log('Failed to start MongoDB server, falling back to in-memory storage', 'server');
+      process.env.USE_MEMORY_DB = 'true';
+      process.env.USE_MONGODB = 'false';
+    }
+  }
+
   // Initialize storage based on environment
-  const storage = createStorage();
+  const storage = await createStorage();
   let storageType = 'in-memory storage';
   if (process.env.USE_MEMORY_DB === 'true') {
     storageType = 'in-memory storage (explicitly configured)';
@@ -86,7 +100,7 @@ app.use((req, res, next) => {
     if (process.env.USE_MONGODB_MEMORY_SERVER === 'true') {
       storageType = 'MongoDB Memory Server (for development)';
     } else {
-      storageType = 'MongoDB database (via MongoDB Compass)';
+      storageType = 'MongoDB database (persistent)';
     }
   }
   log(`Using ${storageType} for data persistence`, "server");

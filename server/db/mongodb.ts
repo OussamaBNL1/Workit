@@ -86,12 +86,19 @@ export async function connectToMongoDB() {
       log('Reusing existing MongoDB Memory Server: ' + MONGODB_URI, 'mongodb');
     }
   } else {
-    log('Using external MongoDB connection: ' + MONGODB_URI, 'mongodb');
+    // Using an external MongoDB connection (persistent)
+    if (!MONGODB_URI) {
+      // Set default MongoDB URI for local development if not provided
+      MONGODB_URI = 'mongodb://localhost:27017/workit';
+      log(`No MONGODB_URI provided, using default: ${MONGODB_URI}`, 'mongodb');
+    } else {
+      log('Using persistent MongoDB connection', 'mongodb');
+    }
   }
 
   if (!MONGODB_URI) {
     cachedConnection.isConnecting = false;
-    throw new Error('Please define the MONGODB_URI environment variable');
+    throw new Error('Failed to determine MongoDB URI');
   }
 
   // Store the connection URI to detect duplicate connection attempts
