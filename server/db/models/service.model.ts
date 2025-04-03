@@ -11,9 +11,10 @@ const ServiceSchema: Schema = new Schema({
   description: { type: String, required: true },
   price: { type: Number, required: true },
   category: { type: String, required: true },
-  deliveryTime: { type: String, required: true },
-  images: { type: [String], default: [] },
-  status: { type: String, enum: ['active', 'paused', 'deleted'], default: 'active' },
+  deliveryTime: { type: String, required: false }, // Make this field optional to match schema
+  image: { type: String, required: false }, // Renamed from images to match schema
+  status: { type: String, enum: ['active', 'inactive'], default: 'active' }, // Match schema enum values
+  createdAt: { type: Date, default: Date.now }
 }, { 
   timestamps: true,
   toJSON: {

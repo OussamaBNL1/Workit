@@ -11,9 +11,11 @@ const JobSchema: Schema = new Schema({
   description: { type: String, required: true },
   budget: { type: Number, required: true },
   category: { type: String, required: true },
-  skills: { type: [String], default: [] },
-  duration: { type: String, required: true },
+  location: { type: String, required: false },  // Made optional to match schema
+  jobType: { type: String, required: true },    // Added to match schema
+  image: { type: String, required: false },     // Added to match schema
   status: { type: String, enum: ['open', 'closed'], default: 'open' },
+  createdAt: { type: Date, default: Date.now }
 }, { 
   timestamps: true,
   toJSON: {
@@ -41,7 +43,7 @@ JobSchema.index({ title: 'text', description: 'text' });
 JobSchema.index({ category: 1 });
 JobSchema.index({ budget: 1 });
 JobSchema.index({ status: 1 });
-JobSchema.index({ skills: 1 });
+JobSchema.index({ jobType: 1 });
 
 // Export the model or create it if it doesn't exist
 export default mongoose.models.Job || mongoose.model<IJob>('Job', JobSchema);

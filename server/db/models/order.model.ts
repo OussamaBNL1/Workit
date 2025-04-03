@@ -9,10 +9,10 @@ const OrderSchema: Schema = new Schema({
   buyerId: { type: Number, required: true, index: true },
   sellerId: { type: Number, required: true, index: true },
   serviceId: { type: Number, required: true, index: true },
-  amount: { type: Number, required: true },
-  paymentMethod: { type: String, enum: ['credit_card', 'paypal', 'bank_transfer'], required: true },
-  paymentStatus: { type: String, enum: ['pending', 'paid', 'refunded', 'failed'], default: 'pending' },
-  requirements: { type: String, default: '' },
+  totalPrice: { type: Number, required: true },
+  paymentMethod: { type: String, enum: ['card', 'bank_transfer'], required: true },
+  status: { type: String, default: 'pending' },
+  createdAt: { type: Date, default: Date.now }
 }, { 
   timestamps: true,
   toJSON: {
@@ -36,7 +36,7 @@ const OrderSchema: Schema = new Schema({
 });
 
 // Create indexes for filtering orders
-OrderSchema.index({ paymentStatus: 1 });
+OrderSchema.index({ status: 1 });
 OrderSchema.index({ createdAt: 1 });
 
 // Export the model or create it if it doesn't exist

@@ -1,7 +1,7 @@
 import express, { type Express, type Request, type Response } from "express";
 import { createServer, type Server } from "http";
 import { type IStorage } from "./storage";
-import { createStorage } from "./storageFactory";
+import { createStorage, currentStorageType } from "./storageFactory";
 import { 
   insertUserSchema, 
   loginSchema, 
@@ -52,7 +52,8 @@ function isAuthenticated(req: Request, res: Response, next: Function) {
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get storage from factory in index.ts
-  const storage = createStorage();
+  // Since createStorage is now async, we need to await it
+  const storage = await createStorage();
   // Setup session
   app.use(session({
     secret: process.env.SESSION_SECRET || "workit-secret",
@@ -622,6 +623,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       res.status(400).json({ message: error.message });
     }
+  });
+
+  // System information endpoint
+  app.get('/api/system/info', (req, res) => {
+    const systemInfo = {
+      databaseType: currentStorageType,
+      nodeVersion: process.version,
+      environment: process.env.NODE_ENV || 'development',
+      timestamp: new Date().toISOString()
+    };
+    res.json(systemInfo);
   });
 
   const httpServer = createServer(app);

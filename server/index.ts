@@ -4,6 +4,7 @@ import { setupVite, serveStatic, log } from "./vite";
 import fileUpload from "express-fileupload";
 import path from "path";
 import { createStorage } from "./storageFactory";
+import * as dotenv from "dotenv";
 
 const app = express();
 app.use(express.json());
@@ -49,9 +50,46 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Initialize storage based on environment (temporarily using in-memory storage)
+  // Load environment variables from .env file
+  try {
+    const dotenvResult = dotenv.config();
+    
+    if (dotenvResult.error) {
+      log(`Error loading .env file: ${dotenvResult.error.message}`, "server");
+    } else {
+      log("Successfully loaded environment variables from .env file", "server");
+    }
+    
+    // Log environment variables after loading
+    log("Environment variables after loading:", "server");
+    log(`USE_MONGODB = ${process.env.USE_MONGODB}`, "server");
+    log(`USE_MONGODB_MEMORY_SERVER = ${process.env.USE_MONGODB_MEMORY_SERVER}`, "server");
+    log(`USE_MEMORY_DB = ${process.env.USE_MEMORY_DB}`, "server");
+    log(`USE_POSTGRES = ${process.env.USE_POSTGRES}`, "server");
+    log(`MONGODB_URI = ${process.env.MONGODB_URI ? '[REDACTED]' : 'undefined'}`, "server");
+  } catch (error) {
+    log(`Unexpected error loading .env file: ${(error as Error).message}`, "server");
+  }
+
+  // If MongoDB is explicitly enabled, we should ignore the DATABASE_URL
+  if (process.env.USE_MONGODB === 'true' && process.env.DATABASE_URL) {
+    delete process.env.DATABASE_URL;
+    log("Removed DATABASE_URL to avoid PostgreSQL activation", "server");
+  }
+  
+  // Initialize storage based on environment
   const storage = createStorage();
-  log("Using in-memory storage for data persistence (temporary)", "server");
+  let storageType = 'in-memory storage';
+  if (process.env.USE_MEMORY_DB === 'true') {
+    storageType = 'in-memory storage (explicitly configured)';
+  } else if (process.env.USE_MONGODB === 'true') {
+    if (process.env.USE_MONGODB_MEMORY_SERVER === 'true') {
+      storageType = 'MongoDB Memory Server (for development)';
+    } else {
+      storageType = 'MongoDB database (via MongoDB Compass)';
+    }
+  }
+  log(`Using ${storageType} for data persistence`, "server");
   
   const server = await registerRoutes(app);
 
