@@ -1,0 +1,99 @@
+:50:15 PM [server] Successfully loaded environment variables from .env file
+1:50:15 PM [server] Environment variables after loading:
+1:50:15 PM [server] USE_MONGODB = true
+1:50:15 PM [server] USE_MONGODB_MEMORY_SERVER = true
+1:50:15 PM [server] USE_MEMORY_DB = false
+1:50:15 PM [server] USE_POSTGRES = false
+1:50:15 PM [server] MONGODB_URI = undefined
+1:50:15 PM [storage] Environment settings - USE_MONGODB: true, USE_MONGODB_MEMORY_SERVER: true, USE_MEMORY_DB: false
+1:50:15 PM [storage] Attempting to use MongoDB storage implementation with Memory Server
+1:50:15 PM [storage] Attempting to import MongoStorage module...
+1:50:15 PM [server] Using MongoDB Memory Server (for development) for data persistence
+1:50:15 PM [storage] Environment settings - USE_MONGODB: true, USE_MONGODB_MEMORY_SERVER: true, USE_MEMORY_DB: false
+1:50:15 PM [storage] Attempting to use MongoDB storage implementation with Memory Server
+1:50:15 PM [storage] Attempting to import MongoStorage module...
+1:50:16 PM [storage] Successfully imported MongoStorage module, initializing...
+1:50:16 PM [storage] Successfully initialized MongoDB storage
+1:50:16 PM [storage] Successfully imported MongoStorage module, initializing...
+1:50:16 PM [storage] Successfully initialized MongoDB storage
+1:50:16 PM [express] serving on port 5000
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+1:50:31 PM [express] GET /api/auth/me 401 in 5ms
+1:50:31 PM [express] GET /api/system/info 200 in 8ms :: {"databaseType":"MongoDB Memory Server","nod…
+1:50:32 PM [mongodb] Created new MongoDB Memory Server: mongodb://127.0.0.1:51561/
+1:50:32 PM [mongodb] Attempting to connect to MongoDB at URI: mongodb://127.0.0.1:51561/
+1:50:32 PM [mongodb] Created new MongoDB Memory Server: mongodb://127.0.0.1:51560/
+1:50:32 PM [mongodb] Attempting to connect to MongoDB at URI: mongodb://127.0.0.1:51560/
+1:50:32 PM [mongodb] Error connecting to MongoDB: Can't call `openUri()` on an active connection with different connection strings. Make sure you aren't calling `mongoose.connect()` multiple times. See: https://mongoosejs.com/docs/connections.html#multiple_connections
+1:50:32 PM [mongodb] Connection string might be invalid or MongoDB server is not accessible.
+1:50:32 PM [storage] MongoDB connection error: Can't call `openUri()` on an active connection with different connection strings. Make sure you aren't calling `mongoose.connect()` multiple times. See: https://mongoosejs.com/docs/connections.html#multiple_connections
+1:50:32 PM [storage] Error getting services: MongoDB connection failed: Can't call `openUri()` on an active connection with different connection strings. Make sure you aren't calling `mongoose.connect()` multiple times. See: https://mongoosejs.com/docs/connections.html#multiple_connections
+1:50:32 PM [express] GET /api/services 304 in 1684ms :: []
+1:50:32 PM [mongodb] Successfully connected to MongoDB
+1:50:33 PM [mongodb] MongoDB version: 7.0.14
+1:50:33 PM [express] GET /api/jobs 304 in 1769ms :: []
+1:50:33 PM [mongodb] Database: test, Collections: 2
+1:50:52 PM [express] POST /api/auth/register 201 in 31ms :: {"username":"oussama","email":"oussama@g…
+1:51:14 PM [express] PUT /api/users/67ee842c5768d7ac61cf55ed 403 in 4ms :: {"message":"You can only …
+1:51:27 PM [express] PUT /api/users/67ee842c5768d7ac61cf55ed 403 in 4ms :: {"message":"You can only …
+1:51:46 PM [express] PUT /api/users/67ee842c5768d7ac61cf55ed 403 in 5ms :: {"message":"You can only …
+Error creating service: ZodError: [
+  {
+    "code": "invalid_type",
+    "expected": "number",
+    "received": "string",
+    "path": [
+      "price"
+    ],
+    "message": "Expected number, received string"
+  }
+]
+    at get error (file:///D:/replit.com/26/CodeCraft/node_modules/zod/lib/index.mjs:587:31)
+    at ZodObject.parse (file:///D:/replit.com/26/CodeCraft/node_modules/zod/lib/index.mjs:692:22)
+    at <anonymous> (D:\replit.com\26\CodeCraft\server\routes.ts:282:47)
+    at Layer.handle [as handle_request] (D:\replit.com\26\CodeCraft\node_modules\express\lib\router\layer.js:95:5)
+    at next (D:\replit.com\26\CodeCraft\node_modules\express\lib\router\route.js:149:13)
+    at isAuthenticated (D:\replit.com\26\CodeCraft\server\routes.ts:44:12)
+    at Layer.handle [as handle_request] (D:\replit.com\26\CodeCraft\node_modules\express\lib\router\layer.js:95:5)
+    at next (D:\replit.com\26\CodeCraft\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (D:\replit.com\26\CodeCraft\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (D:\replit.com\26\CodeCraft\node_modules\express\lib\router\layer.js:95:5)
+    at D:\replit.com\26\CodeCraft\node_modules\express\lib\router\index.js:284:15
+    at Function.process_params (D:\replit.com\26\CodeCraft\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\replit.com\26\CodeCraft\node_modules\express\lib\router\index.js:280:10)
+    at strategy.pass (D:\replit.com\26\CodeCraft\node_modules\passport\lib\middleware\authenticate.js:355:9)
+    at D:\replit.com\26\CodeCraft\node_modules\passport\lib\strategies\session.js:120:12
+    at pass (D:\replit.com\26\CodeCraft\node_modules\passport\lib\authenticator.js:352:31)
+    at deserialized (D:\replit.com\26\CodeCraft\node_modules\passport\lib\authenticator.js:364:7)
+    at <anonymous> (D:\replit.com\26\CodeCraft\server\routes.ts:91:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+  issues: [
+    {
+      code: 'invalid_type',
+      expected: 'number',
+      received: 'string',
+      path: [Array],
+      message: 'Expected number, received string'
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'invalid_type',
+      expected: 'number',
+      received: 'string',
+      path: [Array],
+      message: 'Expected number, received string'
+    }
+  ]
+}
+1:52:09 PM [express] POST /api/services 400 in 18ms :: {"message":"[\n  {\n    \"code\": \"invalid_t…
+1:52:59 PM [express] GET /api/auth/me 200 in 6ms :: {"username":"oussama","email":"oussama@gmail.com…
+1:52:59 PM [express] GET /api/system/info 200 in 6ms :: {"databaseType":"MongoDB Memory Server","nod…
+1:53:34 PM [express] POST /api/auth/logout 200 in 5ms :: {"message":"Logged out successfully"}
+1:53:34 PM [express] GET /api/services 304 in 9ms :: []
+1:53:34 PM [express] GET /api/jobs 304 in 8ms :: []
+1:53:52 PM [express] POST /api/auth/login 401 in 6ms :: {"message":"Invalid username or password"}

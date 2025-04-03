@@ -69,10 +69,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return done(null, false, { message: "Invalid username or password" });
       }
 
-      // In a real app, we'd use bcrypt to compare passwords
-      // For simplicity, direct comparison here
-      if (user.password !== password) {
-        return done(null, false, { message: "Invalid username or password" });
+      // Check if password is hashed (has bcrypt format)
+      if (user.password.startsWith('$2b$') || user.password.startsWith('$2a$')) {
+        // Password is hashed, use bcrypt compare
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) {
+          return done(null, false, { message: "Invalid username or password" });
+        }
+      } else {
+        // For compatibility with non-hashed passwords
+        if (user.password !== password) {
+          return done(null, false, { message: "Invalid username or password" });
+        }
       }
 
       return done(null, user);
@@ -118,8 +126,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Email already exists" });
       }
 
-      // In a real app, we'd hash the password
-      const user = await storage.createUser(userData);
+      // Hash the password with bcrypt
+      const hashedPassword = await bcrypt.hash(userData.password, 10);
+      const user = await storage.createUser({
+        ...userData,
+        password: hashedPassword
+      });
       
       // Remove sensitive data
       const { password, ...safeUser } = user;

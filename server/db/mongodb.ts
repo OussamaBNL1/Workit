@@ -89,6 +89,14 @@ export async function connectToMongoDB() {
   // Check if mongoose is already connected
   if (mongoose.connection.readyState === 1) {
     log('Mongoose already has an active connection, reusing it', 'mongodb');
+    
+    // Check if we're trying to connect to a different URI
+    if (cachedConnection.connectionURI && 
+        cachedConnection.connectionURI !== MONGODB_URI) {
+      log('Warning: Attempting to connect to a different MongoDB URI while a connection is active.', 'mongodb');
+      log('Using existing connection instead.', 'mongodb');
+    }
+    
     cachedConnection.conn = mongoose;
     cachedConnection.isConnecting = false;
     return mongoose;
@@ -98,6 +106,9 @@ export async function connectToMongoDB() {
   log(`Attempting to connect to MongoDB at URI: ${MONGODB_URI.replace(/\/\/([^:]+):([^@]+)@/, '//***:***@')}`, 'mongodb');
   
   try {
+    // Save the connection URI to detect connection to different databases
+    cachedConnection.connectionURI = MONGODB_URI;
+    
     cachedConnection.promise = mongoose
       .connect(MONGODB_URI, opts)
       .then((mongoose) => {
