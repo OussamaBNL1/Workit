@@ -22,31 +22,31 @@ import {
 // Storage interface
 export interface IStorage {
   // User related methods
-  getUser(id: number): Promise<User | undefined>;
+  getUser(id: any): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  updateUser(id: number, userData: Partial<User>): Promise<User | undefined>;
+  updateUser(id: any, userData: Partial<User>): Promise<User | undefined>;
   
   // Service related methods
-  getService(id: number): Promise<Service | undefined>;
+  getService(id: any): Promise<Service | undefined>;
   getServices(filters?: Partial<Service>): Promise<Service[]>;
   getUserServices(userId: number): Promise<Service[]>;
   createService(userId: number, service: InsertService): Promise<Service>;
-  updateService(id: number, serviceData: Partial<Service>): Promise<Service | undefined>;
+  updateService(id: any, serviceData: Partial<Service>): Promise<Service | undefined>;
   
   // Job related methods
-  getJob(id: number): Promise<Job | undefined>;
+  getJob(id: any): Promise<Job | undefined>;
   getJobs(filters?: Partial<Job>): Promise<Job[]>;
   getUserJobs(userId: number): Promise<Job[]>;
   createJob(userId: number, job: InsertJob): Promise<Job>;
-  updateJob(id: number, jobData: Partial<Job>): Promise<Job | undefined>;
+  updateJob(id: any, jobData: Partial<Job>): Promise<Job | undefined>;
   
   // Application related methods
   getApplicationsForJob(jobId: number): Promise<Application[]>;
   getUserApplications(userId: number): Promise<Application[]>;
   createApplication(userId: number, application: InsertApplication): Promise<Application>;
-  updateApplicationStatus(id: number, status: "pending" | "approved" | "rejected"): Promise<Application | undefined>;
+  updateApplicationStatus(id: any, status: "pending" | "approved" | "rejected"): Promise<Application | undefined>;
   
   // Order related methods
   getOrdersForService(serviceId: number): Promise<Order[]>;
@@ -90,8 +90,17 @@ export class MemStorage implements IStorage {
   }
 
   // User methods
-  async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+  async getUser(id: any): Promise<User | undefined> {
+    // If id is a number or can be parsed as a number, use it directly
+    if (typeof id === 'number') {
+      return this.users.get(id);
+    } else if (typeof id === 'string' && !isNaN(parseInt(id))) {
+      return this.users.get(parseInt(id));
+    }
+    
+    // For MongoDB's ObjectId strings or other non-numeric IDs,
+    // we just return undefined since in-memory storage only uses numeric IDs
+    return undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
@@ -124,20 +133,43 @@ export class MemStorage implements IStorage {
     return user;
   }
   
-  async updateUser(id: number, userData: Partial<User>): Promise<User | undefined> {
-    const existingUser = this.users.get(id);
+  async updateUser(id: any, userData: Partial<User>): Promise<User | undefined> {
+    let numericId: number | undefined;
+    
+    // Convert id to numeric if possible
+    if (typeof id === 'number') {
+      numericId = id;
+    } else if (typeof id === 'string' && !isNaN(parseInt(id))) {
+      numericId = parseInt(id);
+    }
+    
+    // If we couldn't get a valid numeric ID, return undefined
+    if (numericId === undefined) {
+      return undefined;
+    }
+    
+    const existingUser = this.users.get(numericId);
     if (!existingUser) {
       return undefined;
     }
     
     const updatedUser = { ...existingUser, ...userData };
-    this.users.set(id, updatedUser);
+    this.users.set(numericId, updatedUser);
     return updatedUser;
   }
 
   // Service methods
-  async getService(id: number): Promise<Service | undefined> {
-    return this.services.get(id);
+  async getService(id: any): Promise<Service | undefined> {
+    // If id is a number or can be parsed as a number, use it directly
+    if (typeof id === 'number') {
+      return this.services.get(id);
+    } else if (typeof id === 'string' && !isNaN(parseInt(id))) {
+      return this.services.get(parseInt(id));
+    }
+    
+    // For MongoDB's ObjectId strings or other non-numeric IDs,
+    // we just return undefined since in-memory storage only uses numeric IDs
+    return undefined;
   }
   
   async getServices(filters?: Partial<Service>): Promise<Service[]> {
@@ -176,20 +208,43 @@ export class MemStorage implements IStorage {
     return newService;
   }
   
-  async updateService(id: number, serviceData: Partial<Service>): Promise<Service | undefined> {
-    const existingService = this.services.get(id);
+  async updateService(id: any, serviceData: Partial<Service>): Promise<Service | undefined> {
+    let numericId: number | undefined;
+    
+    // Convert id to numeric if possible
+    if (typeof id === 'number') {
+      numericId = id;
+    } else if (typeof id === 'string' && !isNaN(parseInt(id))) {
+      numericId = parseInt(id);
+    }
+    
+    // If we couldn't get a valid numeric ID, return undefined
+    if (numericId === undefined) {
+      return undefined;
+    }
+    
+    const existingService = this.services.get(numericId);
     if (!existingService) {
       return undefined;
     }
     
     const updatedService = { ...existingService, ...serviceData };
-    this.services.set(id, updatedService);
+    this.services.set(numericId, updatedService);
     return updatedService;
   }
 
   // Job methods
-  async getJob(id: number): Promise<Job | undefined> {
-    return this.jobs.get(id);
+  async getJob(id: any): Promise<Job | undefined> {
+    // If id is a number or can be parsed as a number, use it directly
+    if (typeof id === 'number') {
+      return this.jobs.get(id);
+    } else if (typeof id === 'string' && !isNaN(parseInt(id))) {
+      return this.jobs.get(parseInt(id));
+    }
+    
+    // For MongoDB's ObjectId strings or other non-numeric IDs,
+    // we just return undefined since in-memory storage only uses numeric IDs
+    return undefined;
   }
   
   async getJobs(filters?: Partial<Job>): Promise<Job[]> {
@@ -228,14 +283,28 @@ export class MemStorage implements IStorage {
     return newJob;
   }
   
-  async updateJob(id: number, jobData: Partial<Job>): Promise<Job | undefined> {
-    const existingJob = this.jobs.get(id);
+  async updateJob(id: any, jobData: Partial<Job>): Promise<Job | undefined> {
+    let numericId: number | undefined;
+    
+    // Convert id to numeric if possible
+    if (typeof id === 'number') {
+      numericId = id;
+    } else if (typeof id === 'string' && !isNaN(parseInt(id))) {
+      numericId = parseInt(id);
+    }
+    
+    // If we couldn't get a valid numeric ID, return undefined
+    if (numericId === undefined) {
+      return undefined;
+    }
+    
+    const existingJob = this.jobs.get(numericId);
     if (!existingJob) {
       return undefined;
     }
     
     const updatedJob = { ...existingJob, ...jobData };
-    this.jobs.set(id, updatedJob);
+    this.jobs.set(numericId, updatedJob);
     return updatedJob;
   }
 
@@ -268,16 +337,30 @@ export class MemStorage implements IStorage {
   }
   
   async updateApplicationStatus(
-    id: number, 
+    id: any, 
     status: "pending" | "approved" | "rejected"
   ): Promise<Application | undefined> {
-    const existingApplication = this.applications.get(id);
+    let numericId: number | undefined;
+    
+    // Convert id to numeric if possible
+    if (typeof id === 'number') {
+      numericId = id;
+    } else if (typeof id === 'string' && !isNaN(parseInt(id))) {
+      numericId = parseInt(id);
+    }
+    
+    // If we couldn't get a valid numeric ID, return undefined
+    if (numericId === undefined) {
+      return undefined;
+    }
+    
+    const existingApplication = this.applications.get(numericId);
     if (!existingApplication) {
       return undefined;
     }
     
     const updatedApplication = { ...existingApplication, status };
-    this.applications.set(id, updatedApplication);
+    this.applications.set(numericId, updatedApplication);
     return updatedApplication;
   }
 

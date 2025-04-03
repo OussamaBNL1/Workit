@@ -6,7 +6,7 @@ export interface IJob extends Document, Omit<Job, 'id'> {
 }
 
 const JobSchema: Schema = new Schema({
-  userId: { type: Number, required: true, index: true },
+  userId: { type: Schema.Types.Mixed, required: true, index: true }, // Allow both number and ObjectId
   title: { type: String, required: true },
   description: { type: String, required: true },
   budget: { type: Number, required: true },

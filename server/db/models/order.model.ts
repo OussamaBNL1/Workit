@@ -6,9 +6,9 @@ export interface IOrder extends Document, Omit<Order, 'id'> {
 }
 
 const OrderSchema: Schema = new Schema({
-  buyerId: { type: Number, required: true, index: true },
-  sellerId: { type: Number, required: true, index: true },
-  serviceId: { type: Number, required: true, index: true },
+  buyerId: { type: Schema.Types.Mixed, required: true, index: true }, // Allow both number and ObjectId
+  sellerId: { type: Schema.Types.Mixed, required: true, index: true }, // Allow both number and ObjectId
+  serviceId: { type: Schema.Types.Mixed, required: true, index: true }, // Allow both number and ObjectId
   totalPrice: { type: Number, required: true },
   paymentMethod: { type: String, enum: ['card', 'bank_transfer'], required: true },
   status: { type: String, default: 'pending' },

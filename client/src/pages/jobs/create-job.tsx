@@ -78,18 +78,9 @@ const CreateJob: React.FC = () => {
         formData.append('image', data.image);
       }
 
-      const response = await fetch('/api/jobs', {
-        method: 'POST',
-        credentials: 'include',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to create job');
-      }
-
-      return response.json();
+      // Use apiRequest which already handles credentials and error checking
+      const response = await apiRequest('POST', '/api/jobs', formData, true); // true = use FormData
+      return await response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/jobs'] });

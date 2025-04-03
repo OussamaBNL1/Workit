@@ -315,6 +315,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/services', isAuthenticated, async (req, res) => {
     try {
+      console.log('Service creation request received', { bodyKeys: Object.keys(req.body), hasFiles: !!req.files });
+      
+      // Need to handle the price as a number correctly
+      if (req.body.price && typeof req.body.price === 'string') {
+        req.body.price = parseFloat(req.body.price);
+      }
+      
       const serviceData = insertServiceSchema.parse(req.body);
       const userId = (req.user as any).id;
       
@@ -332,8 +339,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const service = await storage.createService(userId, serviceData);
       res.status(201).json(service);
     } catch (error: any) {
-      console.error('Error creating service:', error);
-      res.status(400).json({ message: error.message });
+      console.error('Error creating service:', error.message);
+      if (error.errors) {
+        console.error('Validation errors:', JSON.stringify(error.errors));
+      }
+      res.status(400).json({ 
+        message: error.message,
+        errors: error.errors || undefined
+      });
     }
   });
 
@@ -396,6 +409,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/jobs', isAuthenticated, async (req, res) => {
     try {
+      console.log('Job creation request received', { bodyKeys: Object.keys(req.body), hasFiles: !!req.files });
+      
+      // Need to handle the salary/budget as a number correctly
+      if (req.body.budget && typeof req.body.budget === 'string') {
+        req.body.budget = parseFloat(req.body.budget);
+      }
+      
       const jobData = insertJobSchema.parse(req.body);
       const userId = (req.user as any).id;
       
@@ -413,8 +433,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const job = await storage.createJob(userId, jobData);
       res.status(201).json(job);
     } catch (error: any) {
-      console.error('Error creating job:', error);
-      res.status(400).json({ message: error.message });
+      console.error('Error creating job:', error.message);
+      if (error.errors) {
+        console.error('Validation errors:', JSON.stringify(error.errors));
+      }
+      res.status(400).json({ 
+        message: error.message,
+        errors: error.errors || undefined
+      });
     }
   });
 

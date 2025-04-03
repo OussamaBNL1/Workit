@@ -6,8 +6,8 @@ export interface IApplication extends Document, Omit<Application, 'id'> {
 }
 
 const ApplicationSchema: Schema = new Schema({
-  userId: { type: Number, required: true, index: true },
-  jobId: { type: Number, required: true, index: true },
+  userId: { type: Schema.Types.Mixed, required: true, index: true }, // Allow both number and ObjectId
+  jobId: { type: Schema.Types.Mixed, required: true, index: true }, // Allow both number and ObjectId
   coverLetter: { type: String, required: true },
   price: { type: Number, required: true },
   attachments: { type: [String], default: [] },

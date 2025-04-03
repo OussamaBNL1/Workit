@@ -52,23 +52,35 @@ export class MongoStorage implements IStorage {
     }
   }
 
-  async getUser(id: number): Promise<User | undefined> {
+  async getUser(id: any): Promise<User | undefined> {
     try {
       await this.ensureConnection();
-      const user = await UserModel.findOne({ id });
+      let user = null;
       
-      // If not found by numeric id, try to find by MongoDB's _id string if it looks like a MongoDB ID
-      if (!user && typeof id === 'number') {
-        try {
-          log(`User not found with numeric id ${id}, checking for MongoDB ObjectId`, 'storage');
-          const objectIdUser = await UserModel.findOne({ _id: id });
-          return convertDocument<User>(objectIdUser);
-        } catch (err) {
-          // Ignore this error, it's just a fallback attempt
+      // Handle numeric IDs (from the in-memory storage or imported data)
+      if (typeof id === 'number' || (typeof id === 'string' && !isNaN(parseInt(id)))) {
+        const numericId = typeof id === 'number' ? id : parseInt(id);
+        user = await UserModel.findOne({ id: numericId });
+        
+        if (user) {
+          return convertDocument<User>(user);
         }
       }
       
-      return convertDocument<User>(user);
+      // If not found by numeric id or id is a string that looks like MongoDB ObjectId, try direct _id lookup
+      try {
+        // For MongoDB ObjectId strings or when passing the _id directly
+        user = await UserModel.findById(id);
+        if (user) {
+          return convertDocument<User>(user);
+        }
+      } catch (err) {
+        // Ignore this error, it's just a fallback attempt
+      }
+      
+      // If we got this far, we couldn't find the user
+      log(`User not found with id ${id} (type: ${typeof id})`, 'storage');
+      return undefined;
     } catch (error) {
       log(`Error getting user: ${(error as Error).message}`, 'storage');
       return undefined;
@@ -170,11 +182,32 @@ export class MongoStorage implements IStorage {
     }
   }
 
-  async getService(id: number): Promise<Service | undefined> {
+  async getService(id: any): Promise<Service | undefined> {
     try {
       await this.ensureConnection();
-      const service = await ServiceModel.findById(id);
-      return convertDocument<Service>(service);
+      let service = null;
+      
+      // Try to find by MongoDB's _id directly
+      try {
+        service = await ServiceModel.findById(id);
+        if (service) {
+          return convertDocument<Service>(service);
+        }
+      } catch (err) {
+        // If this fails, it might be a numeric ID
+      }
+      
+      // If not found or error occurred, try by numeric id
+      if (typeof id === 'number' || (typeof id === 'string' && !isNaN(parseInt(id)))) {
+        const numericId = typeof id === 'number' ? id : parseInt(id);
+        service = await ServiceModel.findOne({ id: numericId });
+        if (service) {
+          return convertDocument<Service>(service);
+        }
+      }
+      
+      log(`Service not found with id ${id}`, 'storage');
+      return undefined;
     } catch (error) {
       log(`Error getting service: ${(error as Error).message}`, 'storage');
       return undefined;
@@ -215,26 +248,74 @@ export class MongoStorage implements IStorage {
     }
   }
 
-  async updateService(id: number, serviceData: Partial<Service>): Promise<Service | undefined> {
+  async updateService(id: any, serviceData: Partial<Service>): Promise<Service | undefined> {
     try {
       await this.ensureConnection();
-      const updatedService = await ServiceModel.findByIdAndUpdate(
-        id,
-        { $set: serviceData },
-        { new: true }
-      );
-      return convertDocument<Service>(updatedService);
+      let updatedService;
+      
+      // Try to update by MongoDB's _id directly
+      try {
+        updatedService = await ServiceModel.findByIdAndUpdate(
+          id,
+          { $set: serviceData },
+          { new: true }
+        );
+        
+        if (updatedService) {
+          return convertDocument<Service>(updatedService);
+        }
+      } catch (err) {
+        // If this fails, it might be a numeric ID
+      }
+      
+      // If not found or error occurred, try by numeric id
+      if (typeof id === 'number' || (typeof id === 'string' && !isNaN(parseInt(id)))) {
+        const numericId = typeof id === 'number' ? id : parseInt(id);
+        updatedService = await ServiceModel.findOneAndUpdate(
+          { id: numericId },
+          { $set: serviceData },
+          { new: true }
+        );
+        
+        if (updatedService) {
+          return convertDocument<Service>(updatedService);
+        }
+      }
+      
+      log(`Service not found with id ${id} to update`, 'storage');
+      return undefined;
     } catch (error) {
       log(`Error updating service: ${(error as Error).message}`, 'storage');
       return undefined;
     }
   }
 
-  async getJob(id: number): Promise<Job | undefined> {
+  async getJob(id: any): Promise<Job | undefined> {
     try {
       await this.ensureConnection();
-      const job = await JobModel.findById(id);
-      return convertDocument<Job>(job);
+      let job = null;
+      
+      // Try to find by MongoDB's _id directly
+      try {
+        job = await JobModel.findById(id);
+        if (job) {
+          return convertDocument<Job>(job);
+        }
+      } catch (err) {
+        // If this fails, it might be a numeric ID
+      }
+      
+      // If not found or error occurred, try by numeric id
+      if (typeof id === 'number' || (typeof id === 'string' && !isNaN(parseInt(id)))) {
+        const numericId = typeof id === 'number' ? id : parseInt(id);
+        job = await JobModel.findOne({ id: numericId });
+        if (job) {
+          return convertDocument<Job>(job);
+        }
+      }
+      
+      log(`Job not found with id ${id}`, 'storage');
+      return undefined;
     } catch (error) {
       log(`Error getting job: ${(error as Error).message}`, 'storage');
       return undefined;
@@ -275,15 +356,42 @@ export class MongoStorage implements IStorage {
     }
   }
 
-  async updateJob(id: number, jobData: Partial<Job>): Promise<Job | undefined> {
+  async updateJob(id: any, jobData: Partial<Job>): Promise<Job | undefined> {
     try {
       await this.ensureConnection();
-      const updatedJob = await JobModel.findByIdAndUpdate(
-        id,
-        { $set: jobData },
-        { new: true }
-      );
-      return convertDocument<Job>(updatedJob);
+      let updatedJob;
+      
+      // Try to update by MongoDB's _id directly
+      try {
+        updatedJob = await JobModel.findByIdAndUpdate(
+          id,
+          { $set: jobData },
+          { new: true }
+        );
+        
+        if (updatedJob) {
+          return convertDocument<Job>(updatedJob);
+        }
+      } catch (err) {
+        // If this fails, it might be a numeric ID
+      }
+      
+      // If not found or error occurred, try by numeric id
+      if (typeof id === 'number' || (typeof id === 'string' && !isNaN(parseInt(id)))) {
+        const numericId = typeof id === 'number' ? id : parseInt(id);
+        updatedJob = await JobModel.findOneAndUpdate(
+          { id: numericId },
+          { $set: jobData },
+          { new: true }
+        );
+        
+        if (updatedJob) {
+          return convertDocument<Job>(updatedJob);
+        }
+      }
+      
+      log(`Job not found with id ${id} to update`, 'storage');
+      return undefined;
     } catch (error) {
       log(`Error updating job: ${(error as Error).message}`, 'storage');
       return undefined;
@@ -325,17 +433,44 @@ export class MongoStorage implements IStorage {
   }
 
   async updateApplicationStatus(
-    id: number,
+    id: any,
     status: "pending" | "approved" | "rejected"
   ): Promise<Application | undefined> {
     try {
       await this.ensureConnection();
-      const updatedApplication = await ApplicationModel.findByIdAndUpdate(
-        id,
-        { $set: { status } },
-        { new: true }
-      );
-      return convertDocument<Application>(updatedApplication);
+      let updatedApplication;
+      
+      // Try to update by MongoDB's _id directly
+      try {
+        updatedApplication = await ApplicationModel.findByIdAndUpdate(
+          id,
+          { $set: { status } },
+          { new: true }
+        );
+        
+        if (updatedApplication) {
+          return convertDocument<Application>(updatedApplication);
+        }
+      } catch (err) {
+        // If this fails, it might be a numeric ID
+      }
+      
+      // If not found or error occurred, try by numeric id
+      if (typeof id === 'number' || (typeof id === 'string' && !isNaN(parseInt(id)))) {
+        const numericId = typeof id === 'number' ? id : parseInt(id);
+        updatedApplication = await ApplicationModel.findOneAndUpdate(
+          { id: numericId },
+          { $set: { status } },
+          { new: true }
+        );
+        
+        if (updatedApplication) {
+          return convertDocument<Application>(updatedApplication);
+        }
+      }
+      
+      log(`Application not found with id ${id} to update status`, 'storage');
+      return undefined;
     } catch (error) {
       log(`Error updating application status: ${(error as Error).message}`, 'storage');
       return undefined;

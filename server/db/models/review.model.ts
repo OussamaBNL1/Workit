@@ -6,8 +6,8 @@ export interface IReview extends Document, Omit<Review, 'id'> {
 }
 
 const ReviewSchema: Schema = new Schema({
-  userId: { type: Number, required: true, index: true },
-  serviceId: { type: Number, required: true, index: true },
+  userId: { type: Schema.Types.Mixed, required: true, index: true }, // Allow both number and ObjectId
+  serviceId: { type: Schema.Types.Mixed, required: true, index: true }, // Allow both number and ObjectId
   rating: { type: Number, required: true, min: 1, max: 5 },
   comment: { type: String, required: true },
 }, { 

@@ -72,18 +72,9 @@ const EditProfile: React.FC = () => {
         profilePictureType: data.profilePicture instanceof File ? 'File' : typeof data.profilePicture
       });
 
-      const response = await fetch(`/api/users/${user?.id}`, {
-        method: 'PUT',
-        credentials: 'include',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update profile');
-      }
-
-      return response.json();
+      // Use apiRequest which already handles credentials and error checking
+      const response = await apiRequest('PUT', `/api/users/${user?.id}`, formData, true); // true = use FormData
+      return await response.json();
     },
     onSuccess: () => {
       checkAuth(); // Refresh auth state
