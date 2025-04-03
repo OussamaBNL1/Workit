@@ -26,7 +26,7 @@ export async function connectToMongoDB() {
     let MONGODB_URI = process.env.MONGODB_URI;
     
     // If USE_MONGODB_MEMORY_SERVER is set, use the in-memory MongoDB server
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.USE_MONGODB_MEMORY_SERVER === 'true') {
       try {
         // Create an in-memory MongoDB server
         const mongoMemoryServer = await MongoMemoryServer.create();
@@ -37,6 +37,8 @@ export async function connectToMongoDB() {
         log(`Error starting MongoDB Memory Server: ${error}`, 'mongodb');
         // Fall back to the environment variable
       }
+    } else {
+      log('Using external MongoDB connection: ' + MONGODB_URI, 'mongodb');
     }
 
     if (!MONGODB_URI) {
@@ -49,14 +51,35 @@ export async function connectToMongoDB() {
     };
 
     // Create the connection promise
+    log(`Attempting to connect to MongoDB at URI: ${MONGODB_URI.replace(/\/\/([^:]+):([^@]+)@/, '//***:***@')}`, 'mongodb');
+    
     cachedConnection.promise = mongoose
       .connect(MONGODB_URI, opts)
       .then((mongoose) => {
-        log('Connected to MongoDB', 'mongodb');
+        log('Successfully connected to MongoDB', 'mongodb');
+        // Log the connection details
+        if (mongoose.connection && mongoose.connection.db) {
+          const dbInstance = mongoose.connection.db;
+          Promise.resolve()
+            .then(() => dbInstance.admin().serverInfo())
+            .then(info => {
+              log(`MongoDB version: ${info.version}`, 'mongodb');
+              return dbInstance.stats();
+            })
+            .then(stats => {
+              log(`Database: ${mongoose.connection.name}, Collections: ${stats.collections}`, 'mongodb');
+            })
+            .catch(err => {
+              log(`Could not retrieve MongoDB server info: ${err.message}`, 'mongodb');
+            });
+        } else {
+          log('MongoDB connection established but database information unavailable', 'mongodb');
+        }
         return mongoose;
       })
       .catch((error) => {
         log(`Error connecting to MongoDB: ${error.message}`, 'mongodb');
+        log(`Connection string might be invalid or MongoDB server is not accessible.`, 'mongodb');
         cachedConnection.promise = null;
         throw error;
       });

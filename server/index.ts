@@ -49,15 +49,9 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Initialize storage based on environment
+  // Initialize storage based on environment (temporarily using in-memory storage)
   const storage = createStorage();
-  let storageType = 'in-memory storage';
-  if (process.env.USE_MONGODB === 'true') {
-    storageType = 'MongoDB database';
-  } else if (process.env.DATABASE_URL) {
-    storageType = 'PostgreSQL database';
-  }
-  log(`Using ${storageType} for data persistence`, "server");
+  log("Using in-memory storage for data persistence (temporary)", "server");
   
   const server = await registerRoutes(app);
 
