@@ -15,7 +15,6 @@ import session from "express-session";
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import bcrypt from "bcrypt";
-import multer from "multer";
 import path from "path";
 import fs from "fs";
 import fileUpload from "express-fileupload";
@@ -24,23 +23,20 @@ import fileUpload from "express-fileupload";
 // Remove the declaration because it conflicts with built-in Express type
 // We'll use explicit type assertions when working with files
 
-// Setup file upload
+// Ensure uploads directory exists
 const uploadDir = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-const fileStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
+// Create the subdirectories for different upload types
+const uploadSubdirs = ['profiles', 'services', 'jobs', 'resumes'];
+for (const subdir of uploadSubdirs) {
+  const subdirPath = path.join(uploadDir, subdir);
+  if (!fs.existsSync(subdirPath)) {
+    fs.mkdirSync(subdirPath, { recursive: true });
   }
-});
-
-const upload = multer({ storage: fileStorage });
+}
 
 // Helper function to check authentication
 function isAuthenticated(req: Request, res: Response, next: Function) {
@@ -362,19 +358,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/jobs', isAuthenticated, upload.single('image'), async (req, res) => {
+  app.post('/api/jobs', isAuthenticated, async (req, res) => {
     try {
       const jobData = insertJobSchema.parse(req.body);
       const userId = (req.user as any).id;
       
-      // Handle file upload
-      if (req.file) {
-        jobData.image = `/uploads/${req.file.filename}`;
+      // Handle file upload using express-fileupload
+      if (req.files && typeof req.files === 'object' && 'image' in req.files) {
+        // Import and use the fileUpload utility
+        const { saveFile } = await import('./utils/fileUpload');
+        // Use any to bypass type checking since we know the object has the correct structure
+        const uploadedFile = (req.files as any).image;
+        const uploadResult = await saveFile(uploadedFile, 'jobs');
+        jobData.image = uploadResult.fileUrl;
+        console.log('Job image uploaded:', uploadResult.fileUrl);
       }
       
       const job = await storage.createJob(userId, jobData);
       res.status(201).json(job);
     } catch (error: any) {
+      console.error('Error creating job:', error);
       res.status(400).json({ message: error.message });
     }
   });
@@ -423,7 +426,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/jobs/:id/applications', isAuthenticated, upload.single('resumeFile'), async (req, res) => {
+  app.post('/api/jobs/:id/applications', isAuthenticated, async (req, res) => {
     try {
       const jobId = parseInt(req.params.id);
       const userId = (req.user as any).id;
@@ -444,14 +447,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         jobId
       });
       
-      // Handle file upload
-      if (req.file) {
-        applicationData.resumeFile = `/uploads/${req.file.filename}`;
+      // Handle file upload using express-fileupload
+      if (req.files && typeof req.files === 'object' && 'resumeFile' in req.files) {
+        // Import and use the fileUpload utility
+        const { saveFile } = await import('./utils/fileUpload');
+        // Use any to bypass type checking since we know the object has the correct structure
+        const uploadedFile = (req.files as any).resumeFile;
+        const uploadResult = await saveFile(uploadedFile, 'resumes');
+        applicationData.resumeFile = uploadResult.fileUrl;
+        console.log('Resume file uploaded:', uploadResult.fileUrl);
       }
       
       const application = await storage.createApplication(userId, applicationData);
       res.status(201).json(application);
     } catch (error: any) {
+      console.error('Error creating application:', error);
       res.status(400).json({ message: error.message });
     }
   });

@@ -37,14 +37,24 @@ function convertDocuments<T>(docs: mongoose.Document[]): T[] {
  */
 export class MongoStorage implements IStorage {
   constructor() {
-    // Initialize MongoDB connection
-    connectToMongoDB().catch(err => {
-      log(`MongoDB connection error: ${err.message}`, 'storage');
-    });
+    // Initialize MongoDB connection - connection is handled on-demand
+    // Don't force a connection here to avoid multiple connection attempts
+    // Each method will ensure the connection before performing operations
+  }
+  
+  // Helper method to ensure connection before running DB operations
+  private async ensureConnection() {
+    try {
+      return await connectToMongoDB();
+    } catch (err) {
+      log(`MongoDB connection error: ${(err as Error).message}`, 'storage');
+      throw new Error(`MongoDB connection failed: ${(err as Error).message}`);
+    }
   }
 
   async getUser(id: number): Promise<User | undefined> {
     try {
+      await this.ensureConnection();
       const user = await UserModel.findById(id);
       return convertDocument<User>(user);
     } catch (error) {
@@ -55,6 +65,7 @@ export class MongoStorage implements IStorage {
 
   async getUserByUsername(username: string): Promise<User | undefined> {
     try {
+      await this.ensureConnection();
       const user = await UserModel.findOne({ username });
       return convertDocument<User>(user);
     } catch (error) {
@@ -65,6 +76,7 @@ export class MongoStorage implements IStorage {
 
   async getUserByEmail(email: string): Promise<User | undefined> {
     try {
+      await this.ensureConnection();
       const user = await UserModel.findOne({ email });
       return convertDocument<User>(user);
     } catch (error) {
@@ -75,6 +87,7 @@ export class MongoStorage implements IStorage {
 
   async createUser(user: InsertUser): Promise<User> {
     try {
+      await this.ensureConnection();
       const newUser = new UserModel(user);
       await newUser.save();
       return convertDocument<User>(newUser)!;
@@ -86,6 +99,7 @@ export class MongoStorage implements IStorage {
 
   async updateUser(id: number, userData: Partial<User>): Promise<User | undefined> {
     try {
+      await this.ensureConnection();
       const updatedUser = await UserModel.findByIdAndUpdate(
         id,
         { $set: userData },
@@ -100,6 +114,7 @@ export class MongoStorage implements IStorage {
 
   async getService(id: number): Promise<Service | undefined> {
     try {
+      await this.ensureConnection();
       const service = await ServiceModel.findById(id);
       return convertDocument<Service>(service);
     } catch (error) {
@@ -110,6 +125,7 @@ export class MongoStorage implements IStorage {
 
   async getServices(filters?: Partial<Service>): Promise<Service[]> {
     try {
+      await this.ensureConnection();
       const services = await ServiceModel.find(filters || {});
       return convertDocuments<Service>(services);
     } catch (error) {
@@ -120,6 +136,7 @@ export class MongoStorage implements IStorage {
 
   async getUserServices(userId: number): Promise<Service[]> {
     try {
+      await this.ensureConnection();
       const services = await ServiceModel.find({ userId });
       return convertDocuments<Service>(services);
     } catch (error) {
@@ -130,6 +147,7 @@ export class MongoStorage implements IStorage {
 
   async createService(userId: number, service: InsertService): Promise<Service> {
     try {
+      await this.ensureConnection();
       const newService = new ServiceModel({ ...service, userId });
       await newService.save();
       return convertDocument<Service>(newService)!;
@@ -141,6 +159,7 @@ export class MongoStorage implements IStorage {
 
   async updateService(id: number, serviceData: Partial<Service>): Promise<Service | undefined> {
     try {
+      await this.ensureConnection();
       const updatedService = await ServiceModel.findByIdAndUpdate(
         id,
         { $set: serviceData },
@@ -155,6 +174,7 @@ export class MongoStorage implements IStorage {
 
   async getJob(id: number): Promise<Job | undefined> {
     try {
+      await this.ensureConnection();
       const job = await JobModel.findById(id);
       return convertDocument<Job>(job);
     } catch (error) {
@@ -165,6 +185,7 @@ export class MongoStorage implements IStorage {
 
   async getJobs(filters?: Partial<Job>): Promise<Job[]> {
     try {
+      await this.ensureConnection();
       const jobs = await JobModel.find(filters || {});
       return convertDocuments<Job>(jobs);
     } catch (error) {
@@ -175,6 +196,7 @@ export class MongoStorage implements IStorage {
 
   async getUserJobs(userId: number): Promise<Job[]> {
     try {
+      await this.ensureConnection();
       const jobs = await JobModel.find({ userId });
       return convertDocuments<Job>(jobs);
     } catch (error) {
@@ -185,6 +207,7 @@ export class MongoStorage implements IStorage {
 
   async createJob(userId: number, job: InsertJob): Promise<Job> {
     try {
+      await this.ensureConnection();
       const newJob = new JobModel({ ...job, userId });
       await newJob.save();
       return convertDocument<Job>(newJob)!;
@@ -196,6 +219,7 @@ export class MongoStorage implements IStorage {
 
   async updateJob(id: number, jobData: Partial<Job>): Promise<Job | undefined> {
     try {
+      await this.ensureConnection();
       const updatedJob = await JobModel.findByIdAndUpdate(
         id,
         { $set: jobData },
@@ -210,6 +234,7 @@ export class MongoStorage implements IStorage {
 
   async getApplicationsForJob(jobId: number): Promise<Application[]> {
     try {
+      await this.ensureConnection();
       const applications = await ApplicationModel.find({ jobId });
       return convertDocuments<Application>(applications);
     } catch (error) {
@@ -220,6 +245,7 @@ export class MongoStorage implements IStorage {
 
   async getUserApplications(userId: number): Promise<Application[]> {
     try {
+      await this.ensureConnection();
       const applications = await ApplicationModel.find({ userId });
       return convertDocuments<Application>(applications);
     } catch (error) {
@@ -230,6 +256,7 @@ export class MongoStorage implements IStorage {
 
   async createApplication(userId: number, application: InsertApplication): Promise<Application> {
     try {
+      await this.ensureConnection();
       const newApplication = new ApplicationModel({ ...application, userId });
       await newApplication.save();
       return convertDocument<Application>(newApplication)!;
@@ -244,6 +271,7 @@ export class MongoStorage implements IStorage {
     status: "pending" | "approved" | "rejected"
   ): Promise<Application | undefined> {
     try {
+      await this.ensureConnection();
       const updatedApplication = await ApplicationModel.findByIdAndUpdate(
         id,
         { $set: { status } },
@@ -258,6 +286,7 @@ export class MongoStorage implements IStorage {
 
   async getOrdersForService(serviceId: number): Promise<Order[]> {
     try {
+      await this.ensureConnection();
       const orders = await OrderModel.find({ serviceId });
       return convertDocuments<Order>(orders);
     } catch (error) {
@@ -268,6 +297,7 @@ export class MongoStorage implements IStorage {
 
   async getUserOrders(userId: number): Promise<Order[]> {
     try {
+      await this.ensureConnection();
       const orders = await OrderModel.find({
         $or: [{ buyerId: userId }, { sellerId: userId }]
       });
@@ -280,6 +310,7 @@ export class MongoStorage implements IStorage {
 
   async createOrder(order: InsertOrder & { sellerId: number }): Promise<Order> {
     try {
+      await this.ensureConnection();
       const newOrder = new OrderModel(order);
       await newOrder.save();
       return convertDocument<Order>(newOrder)!;
@@ -291,6 +322,7 @@ export class MongoStorage implements IStorage {
 
   async getReviewsForService(serviceId: number): Promise<Review[]> {
     try {
+      await this.ensureConnection();
       const reviews = await ReviewModel.find({ serviceId });
       return convertDocuments<Review>(reviews);
     } catch (error) {
@@ -301,6 +333,7 @@ export class MongoStorage implements IStorage {
 
   async createReview(review: InsertReview): Promise<Review> {
     try {
+      await this.ensureConnection();
       const newReview = new ReviewModel(review);
       await newReview.save();
       return convertDocument<Review>(newReview)!;

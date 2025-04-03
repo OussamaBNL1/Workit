@@ -39,9 +39,8 @@ const UserSchema: Schema = new Schema({
   }
 });
 
-// Create indexes for searching users
-UserSchema.index({ username: 1 }, { unique: true });
-UserSchema.index({ email: 1 }, { unique: true });
+// Create text index for searching users by name
+// We don't redefine username and email indexes as they're already set with unique: true above
 UserSchema.index({ fullName: 'text' });
 UserSchema.index({ role: 1 });
 UserSchema.index({ skills: 1 });

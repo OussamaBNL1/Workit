@@ -1,0 +1,50 @@
+ D:\replit.com\26\CodeCraft> npm run dev
+
+> rest-express@1.0.0 dev
+> tsx server/index.ts
+
+1:18:45 PM [server] Successfully loaded environment variables from .env file
+1:18:45 PM [server] Environment variables after loading:
+1:18:45 PM [server] USE_MONGODB = true
+1:18:45 PM [server] USE_MONGODB_MEMORY_SERVER = true
+1:18:45 PM [server] USE_MEMORY_DB = false
+1:18:45 PM [server] USE_POSTGRES = false
+1:18:45 PM [server] MONGODB_URI = undefined
+1:18:45 PM [storage] Environment settings - USE_MONGODB: true, USE_MONGODB_MEMORY_SERVER: true, USE_MEMORY_DB: false
+1:18:45 PM [storage] Attempting to use MongoDB storage implementation with Memory Server
+1:18:45 PM [storage] Attempting to import MongoStorage module...
+1:18:45 PM [server] Using MongoDB Memory Server (for development) for data persistence
+1:18:45 PM [storage] Environment settings - USE_MONGODB: true, USE_MONGODB_MEMORY_SERVER: true, USE_MEMORY_DB: false
+1:18:45 PM [storage] Attempting to use MongoDB storage implementation with Memory Server
+1:18:45 PM [storage] Attempting to import MongoStorage module...
+1:18:46 PM [storage] Successfully imported MongoStorage module, initializing...
+1:18:46 PM [storage] Successfully initialized MongoDB storage
+1:18:46 PM [storage] Successfully imported MongoStorage module, initializing...
+1:18:46 PM [storage] Successfully initialized MongoDB storage
+(node:27216) [MONGOOSE] Warning: Duplicate schema index on {"username":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27216) [MONGOOSE] Warning: Duplicate schema index on {"email":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+1:18:46 PM [express] serving on port 5000
+1:18:48 PM [mongodb] Using MongoDB Memory Server: mongodb://127.0.0.1:51257/
+1:18:48 PM [mongodb] Attempting to connect to MongoDB at URI: mongodb://127.0.0.1:51257/
+1:18:48 PM [mongodb] Using MongoDB Memory Server: mongodb://127.0.0.1:51258/
+1:18:48 PM [mongodb] Attempting to connect to MongoDB at URI: mongodb://127.0.0.1:51258/
+1:18:48 PM [mongodb] Error connecting to MongoDB: Can't call `openUri()` on an active connection with different connection strings. Make sure you aren't calling `mongoose.connect()` multiple times. See: https://mongoosejs.com/docs/connections.html#multiple_connections
+1:18:48 PM [mongodb] Connection string might be invalid or MongoDB server is not accessible.
+1:18:48 PM [storage] MongoDB connection error: Can't call `openUri()` on an active connection with different connection strings. Make sure you aren't calling `mongoose.connect()` multiple times. See: https://mongoosejs.com/docs/connections.html#multiple_connections
+1:18:48 PM [mongodb] Successfully connected to MongoDB
+1:18:48 PM [mongodb] MongoDB version: 7.0.14
+1:18:48 PM [mongodb] Database: test, Collections: 2
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+1:19:46 PM [express] GET /api/auth/me 401 in 11ms
+1:19:46 PM [express] GET /api/system/info 200 in 15ms :: {"databaseType":"MongoDB Memory Server","no…
+1:19:46 PM [express] GET /api/services 304 in 33ms :: []
+1:19:46 PM [express] GET /api/jobs 304 in 26ms :: []
+1:20:14 PM [storage] Error creating user: User validation failed: fullName: Path `fullName` is required.
+1:20:14 PM [express] POST /api/auth/register 400 in 24ms :: {"message":"User validation failed: full…
+1:20:28 PM [storage] Error creating user: User validation failed: fullName: Path `fullName` is required.
+1:20:28 PM [express] POST /api/auth/register 400 in 9ms :: {"message":"User validation failed: fullN…
+1:20:39 PM [storage] Error creating user: User validation failed: fullName: Path `fullName` is required.
+1:20:39 PM [express] POST /api/auth/register 400 in 7ms :: {"message":"User validation failed: fullN…

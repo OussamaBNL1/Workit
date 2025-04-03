@@ -36,6 +36,7 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   email: text("email").notNull().unique(),
+  fullName: text("full_name").notNull(), // Added fullName field to align with MongoDB model
   role: userRoleEnum("role").notNull().default("freelancer"),
   bio: text("bio"),
   profilePicture: text("profile_picture"),

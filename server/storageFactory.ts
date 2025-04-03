@@ -16,6 +16,7 @@ let mongoStorage: IStorage | null = null;
 export async function createStorage(): Promise<IStorage> {
   // If DATABASE_URL is present but we want MongoDB, remove it to avoid confusion
   if (process.env.USE_MONGODB === 'true' && process.env.DATABASE_URL) {
+    log('Removed DATABASE_URL to avoid PostgreSQL activation', 'server');
     delete process.env.DATABASE_URL;
   }
   
@@ -53,6 +54,8 @@ export async function createStorage(): Promise<IStorage> {
       
       log('Successfully imported MongoStorage module, initializing...', 'storage');
       
+      // Create a new MongoStorage instance but don't connect immediately
+      // Connection will be established on-demand when methods are called
       const storage = new mongoModule.MongoStorage();
       mongoStorage = storage; // Cache the storage instance
       
@@ -69,6 +72,40 @@ export async function createStorage(): Promise<IStorage> {
       
       log('Falling back to in-memory storage due to MongoDB initialization error', 'storage');
       currentStorageType = "In-Memory Storage (MongoDB fallback)";
+      return new MemStorage();
+    }
+  }
+  
+  // Check for PostgreSQL configuration
+  const usePostgres = process.env.USE_POSTGRES === 'true';
+  
+  if (usePostgres && process.env.DATABASE_URL) {
+    log('Attempting to use PostgreSQL/Drizzle storage implementation', 'storage');
+    
+    try {
+      // Dynamically import to avoid requiring Drizzle when not needed
+      log('Attempting to import DrizzleStorage module...', 'storage');
+      
+      // Using dynamic import with async/await for ESM compatibility
+      const drizzleModule = await import('./db/drizzleStorage');
+      
+      log('Successfully imported DrizzleStorage module, initializing...', 'storage');
+      
+      const storage = new drizzleModule.DrizzleStorage();
+      
+      currentStorageType = "PostgreSQL";
+      log('Successfully initialized PostgreSQL/Drizzle storage', 'storage');
+      return storage;
+    } catch (error) {
+      log(`Error initializing PostgreSQL storage: ${(error as Error).message}`, 'storage');
+      
+      // Log full error stack for debugging
+      if ((error as Error).stack) {
+        log(`Error stack: ${(error as Error).stack}`, 'storage');
+      }
+      
+      log('Falling back to in-memory storage due to PostgreSQL initialization error', 'storage');
+      currentStorageType = "In-Memory Storage (PostgreSQL fallback)";
       return new MemStorage();
     }
   }
