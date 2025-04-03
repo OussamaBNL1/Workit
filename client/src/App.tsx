@@ -42,9 +42,7 @@ function Router() {
           {/* Public routes */}
           <Route path="/" component={Home} />
           <Route path="/services" component={ServicesList} />
-          <Route path="/services/:id" component={ServiceDetail} />
           <Route path="/jobs" component={JobsList} />
-          <Route path="/jobs/:id" component={JobDetail} />
           <Route path="/auth/login" component={Login} />
           <Route path="/auth/register" component={Register} />
           <Route path="/about" component={About} />
@@ -57,6 +55,10 @@ function Router() {
           <Route path="/jobs/create">
             {isAuthenticated && user?.role === 'employer' ? <CreateJob /> : <Login />}
           </Route>
+          
+          {/* Detail routes (must be after more specific routes) */}
+          <Route path="/services/:id" component={ServiceDetail} />
+          <Route path="/jobs/:id" component={JobDetail} />
           <Route path="/profile">
             {isAuthenticated ? <Profile /> : <Login />}
           </Route>

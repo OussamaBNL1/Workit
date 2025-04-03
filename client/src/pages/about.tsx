@@ -122,9 +122,9 @@ const About: React.FC = () => {
                     <div>
                       <p className="font-medium">Address</p>
                       <p className="text-gray-500">
-                        123 WorkiT Boulevard<br />
-                        San Francisco, CA 94105<br />
-                        United States
+                        Tunisia<br />
+                        Gabes<br />
+                        Mareth
                       </p>
                     </div>
                   </li>

@@ -10,6 +10,15 @@ let mongoStorage: IStorage | undefined;
  * based on environment variables
  */
 export function createStorage(): IStorage {
+  // Check if memory DB is explicitly required
+  const useMemoryDb = process.env.USE_MEMORY_DB === 'true';
+  
+  if (useMemoryDb) {
+    log('Using in-memory storage implementation (explicitly configured)', 'storage');
+    return new MemStorage();
+  }
+  
+  // Check for MongoDB
   const useMongoDb = process.env.USE_MONGODB === 'true';
   
   if (useMongoDb) {
@@ -34,7 +43,7 @@ export function createStorage(): IStorage {
     log('MongoDB storage was not properly initialized, falling back to in-memory storage', 'storage');
     return new MemStorage();
   } else {
-    log('Using in-memory storage implementation', 'storage');
+    log('Using in-memory storage implementation (default fallback)', 'storage');
     return new MemStorage();
   }
 }
