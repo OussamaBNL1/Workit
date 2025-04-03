@@ -69,6 +69,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return done(null, false, { message: "Invalid username or password" });
       }
 
+      // Check if user has a password
+      if (!user.password) {
+        return done(null, false, { message: "Invalid username or password" });
+      }
+      
       // Check if password is hashed (has bcrypt format)
       if (user.password.startsWith('$2b$') || user.password.startsWith('$2a$')) {
         // Password is hashed, use bcrypt compare

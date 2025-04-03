@@ -55,7 +55,19 @@ export class MongoStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
     try {
       await this.ensureConnection();
-      const user = await UserModel.findById(id);
+      const user = await UserModel.findOne({ id });
+      
+      // If not found by numeric id, try to find by MongoDB's _id string if it looks like a MongoDB ID
+      if (!user && typeof id === 'number') {
+        try {
+          log(`User not found with numeric id ${id}, checking for MongoDB ObjectId`, 'storage');
+          const objectIdUser = await UserModel.findOne({ _id: id });
+          return convertDocument<User>(objectIdUser);
+        } catch (err) {
+          // Ignore this error, it's just a fallback attempt
+        }
+      }
+      
       return convertDocument<User>(user);
     } catch (error) {
       log(`Error getting user: ${(error as Error).message}`, 'storage');
@@ -100,11 +112,27 @@ export class MongoStorage implements IStorage {
   async updateUser(id: number, userData: Partial<User>): Promise<User | undefined> {
     try {
       await this.ensureConnection();
-      const updatedUser = await UserModel.findByIdAndUpdate(
-        id,
+      // Try to update by numeric id field first
+      let updatedUser = await UserModel.findOneAndUpdate(
+        { id },
         { $set: userData },
         { new: true }
       );
+      
+      // If not found, try to update by MongoDB _id
+      if (!updatedUser) {
+        try {
+          log(`User not found with numeric id ${id} for update, trying MongoDB _id`, 'storage');
+          updatedUser = await UserModel.findByIdAndUpdate(
+            id,
+            { $set: userData },
+            { new: true }
+          );
+        } catch (err) {
+          // Ignore this error, it's just a fallback attempt
+        }
+      }
+      
       return convertDocument<User>(updatedUser);
     } catch (error) {
       log(`Error updating user: ${(error as Error).message}`, 'storage');
