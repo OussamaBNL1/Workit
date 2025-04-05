@@ -1,0 +1,55 @@
+12:41:21 PM [server] Successfully loaded environment variables from .env file
+12:41:21 PM [server] Environment variables after loading:
+12:41:21 PM [server] USE_MONGODB = true
+12:41:21 PM [server] USE_MONGODB_MEMORY_SERVER = true
+12:41:21 PM [server] USE_MEMORY_DB = false
+12:41:21 PM [server] USE_POSTGRES = false
+12:41:21 PM [server] MONGODB_URI = [REDACTED]
+12:41:21 PM [storage] Environment settings - USE_MONGODB: true, USE_MONGODB_MEMORY_SERVER: true, USE_MEMORY_DB: false
+12:41:21 PM [storage] Attempting to use MongoDB storage implementation with Memory Server
+12:41:21 PM [storage] Attempting to import MongoStorage module...
+12:41:22 PM [storage] Successfully imported MongoStorage module, initializing...
+12:41:22 PM [storage] Successfully initialized MongoDB storage
+12:41:22 PM [server] Using MongoDB Memory Server (for development) for data persistence
+12:41:22 PM [storage] Environment settings - USE_MONGODB: true, USE_MONGODB_MEMORY_SERVER: true, USE_MEMORY_DB: false
+12:41:22 PM [storage] Attempting to use MongoDB storage implementation with Memory Server
+12:41:22 PM [storage] Reusing existing MongoDB storage instance
+12:41:22 PM [express] serving on port 5000
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+12:41:56 PM [mongodb] Connection in progress, waiting...
+12:41:56 PM [express] GET /api/auth/me 401 in 12ms
+12:41:57 PM [mongodb] Connection in progress, waiting...
+12:41:57 PM [mongodb] Connection in progress, waiting...
+12:41:57 PM [mongodb] Connection in progress, waiting...
+12:41:57 PM [mongodb] Connection in progress, waiting...
+12:41:57 PM [mongodb] Connection in progress, waiting...
+12:41:57 PM [mongodb] Connection in progress, waiting...
+12:41:57 PM [mongodb] Created new MongoDB Memory Server: mongodb://127.0.0.1:51916/
+12:41:57 PM [mongodb] Attempting to connect to MongoDB at URI: mongodb://127.0.0.1:51916/
+12:41:57 PM [mongodb] MongoDB connection established
+12:41:57 PM [mongodb] Successfully connected to MongoDB
+12:41:57 PM [mongodb] MongoDB version: 7.0.14
+12:41:57 PM [express] GET /api/jobs 304 in 1746ms :: []
+12:41:57 PM [mongodb] Database: test, Collections: 2
+12:41:57 PM [express] GET /api/services 304 in 1786ms :: []
+12:42:11 PM [express] POST /api/auth/register 201 in 102ms :: {"username":"oussama","email":"oussama@…
+Profile picture uploaded: /uploads/profiles/fc4f74d1-c805-44a4-be85-4ec887b51389.jpeg
+Updating user with data: {
+  bio: '',
+  profilePicture: '/uploads/profiles/fc4f74d1-c805-44a4-be85-4ec887b51389.jpeg'
+}
+Error updating user: ReferenceError: id is not defined
+    at <anonymous> (D:\replit.com\26 clone\CodeCraft\server\routes.ts:268:52)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+12:42:20 PM [express] PUT /api/users/67f11713c7610b7af67efd53 400 in 69ms :: {"message":"id is not de…
+Profile picture uploaded: /uploads/profiles/9a190b57-927d-4d24-bac9-32e3fffc8007.jpeg
+Updating user with data: {
+  bio: '',
+  profilePicture: '/uploads/profiles/9a190b57-927d-4d24-bac9-32e3fffc8007.jpeg'
+}
+Error updating user: ReferenceError: id is not defined
+    at <anonymous> (D:\replit.com\26 clone\CodeCraft\server\routes.ts:268:52)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+12:42:57 PM [express] PUT /api/users/67f11713c7610b7af67efd53 400 in 10ms :: {"message":"id is not de…
