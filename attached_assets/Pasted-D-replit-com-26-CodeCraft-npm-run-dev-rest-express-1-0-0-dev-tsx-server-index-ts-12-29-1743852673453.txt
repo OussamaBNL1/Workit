@@ -1,0 +1,43 @@
+D:\replit.com\26\CodeCraft> npm run dev 
+
+> rest-express@1.0.0 dev
+> tsx server/index.ts
+
+12:29:51 PM [server] Successfully loaded environment variables from .env file
+12:29:51 PM [server] Environment variables after loading:
+12:29:51 PM [server] USE_MONGODB = true
+12:29:51 PM [server] USE_MONGODB_MEMORY_SERVER = true
+12:29:51 PM [server] USE_MEMORY_DB = false
+12:29:51 PM [server] USE_POSTGRES = false
+12:29:51 PM [server] MONGODB_URI = [REDACTED]
+12:29:51 PM [storage] Environment settings - USE_MONGODB: true, USE_MONGODB_MEMORY_SERVER: true, USE_MEMORY_DB: false
+12:29:51 PM [storage] Attempting to use MongoDB storage implementation with Memory Server
+12:29:51 PM [storage] Attempting to import MongoStorage module...
+12:29:52 PM [storage] Successfully imported MongoStorage module, initializing...
+12:29:52 PM [storage] Successfully initialized MongoDB storage
+12:29:52 PM [server] Using MongoDB Memory Server (for development) for data persistence
+12:29:52 PM [storage] Environment settings - USE_MONGODB: true, USE_MONGODB_MEMORY_SERVER: true, USE_MEMORY_DB: false
+12:29:52 PM [storage] Attempting to use MongoDB storage implementation with Memory Server
+12:29:52 PM [storage] Reusing existing MongoDB storage instance
+12:29:52 PM [express] serving on port 5000
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+12:30:19 PM [mongodb] Connection in progress, waiting...
+12:30:19 PM [express] GET /api/auth/me 401 in 4ms
+12:30:20 PM [mongodb] Connection in progress, waiting...
+12:30:20 PM [mongodb] Connection in progress, waiting...
+12:30:20 PM [mongodb] Connection in progress, waiting...
+12:30:21 PM [mongodb] Connection in progress, waiting...
+12:30:21 PM [mongodb] Connection in progress, waiting...
+12:30:21 PM [mongodb] Connection in progress, waiting...
+12:30:21 PM [mongodb] Created new MongoDB Memory Server: mongodb://127.0.0.1:51673/
+12:30:21 PM [mongodb] Attempting to connect to MongoDB at URI: mongodb://127.0.0.1:51673/
+12:30:21 PM [mongodb] Connection in progress, waiting...
+12:30:21 PM [mongodb] Successfully connected to MongoDB
+12:30:21 PM [mongodb] MongoDB version: 7.0.14
+12:30:21 PM [mongodb] Database: test, Collections: 1
+12:30:21 PM [express] GET /api/services 304 in 2264ms :: []
+12:30:21 PM [express] GET /api/jobs 304 in 2258ms :: []
+12:30:38 PM [express] POST /api/auth/register 201 in 106ms :: {"username":"oussama","email":"oussama@…
+12:30:46 PM [express] PUT /api/users/67f1145df3fe4d40450bc80b 403 in 6ms :: {"message":"You can only …
