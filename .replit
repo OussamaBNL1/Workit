@@ -11,7 +11,7 @@ build = ["npm", "run", "build"]
 run = ["npm", "run", "start"]
 
 [workflows]
-runButton = "Project"
+runButton = "Start application with MongoDB"
 
 [[workflows.workflow]]
 name = "Project"
@@ -37,6 +37,27 @@ task = "shell.exec"
 args = "npm run dev"
 waitForPort = 5000
 
+[[workflows.workflow]]
+name = "Start application with MongoDB"
+author = 41085020
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pkill mongod || true"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "mkdir -p mongodb-data"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "mongod --dbpath mongodb-data --port 27017 --bind_ip 0.0.0.0 --fork --logpath mongodb.log"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
+
 [[ports]]
 localPort = 5000
 externalPort = 80
@@ -44,4 +65,3 @@ externalPort = 80
 [[ports]]
 localPort = 27017
 externalPort = 3000
-exposeLocalhost = true
