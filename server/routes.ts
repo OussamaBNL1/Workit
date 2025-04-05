@@ -265,7 +265,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log('Updating user with data:', userData);
       
-      const updatedUser = await storage.updateUser(id, userData);
+      // Don't convert paramId to integer if it's a MongoDB ObjectId
+      const userId = paramId.match(/^[0-9a-fA-F]{24}$/) ? paramId : parseInt(paramId);
+      
+      const updatedUser = await storage.updateUser(userId, userData);
       if (!updatedUser) {
         return res.status(404).json({ message: "User not found" });
       }
