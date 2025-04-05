@@ -8,6 +8,8 @@ interface MongoConnection {
   mongoMemoryServer?: MongoMemoryServer;
   isConnecting: boolean;
   connectionURI?: string;
+  reconnectAttempts: number;
+  maxReconnectAttempts: number;
 }
 
 // Define mongoose connection states
@@ -21,8 +23,24 @@ const MONGOOSE_CONNECTION_STATES = {
 let cachedConnection: MongoConnection = { 
   conn: null,
   isConnecting: false,
-  connectionURI: undefined
+  connectionURI: undefined,
+  reconnectAttempts: 0,
+  maxReconnectAttempts: 5
 };
+
+// Add connection error handler
+mongoose.connection.on('error', (error) => {
+  log(`MongoDB connection error: ${error}`, 'mongodb');
+  if (cachedConnection.reconnectAttempts < cachedConnection.maxReconnectAttempts) {
+    cachedConnection.reconnectAttempts++;
+    setTimeout(() => connectToMongoDB(), 1000 * cachedConnection.reconnectAttempts);
+  }
+});
+
+mongoose.connection.on('connected', () => {
+  cachedConnection.reconnectAttempts = 0;
+  log('MongoDB connection established', 'mongodb');
+});
 
 /**
  * Connect to MongoDB

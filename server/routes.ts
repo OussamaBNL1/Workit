@@ -239,11 +239,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put('/api/users/:id', isAuthenticated, async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const paramId = req.params.id;
       const currentUser = req.user as any;
       
-      // Check if trying to update own profile
-      if (currentUser.id !== id) {
+      // Handle both MongoDB ObjectId and numeric IDs
+      const isCurrentUser = currentUser.id.toString() === paramId.toString() || 
+                          currentUser._id?.toString() === paramId.toString();
+      
+      if (!isCurrentUser) {
         return res.status(403).json({ message: "You can only update your own profile" });
       }
       
